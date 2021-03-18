@@ -17,7 +17,7 @@ devtools::install_github("Pechli-Lab/SurvdigitizeR")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example digitizing the survival curve found in the vignettes folder.
 
 ``` r
 library(SurvdigtizeR)
