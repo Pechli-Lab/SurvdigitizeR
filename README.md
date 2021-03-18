@@ -12,7 +12,7 @@ You can install the released version of SurvdigtizeR from github.
 
 ``` r
 # Install development version from GitHub
-devtools::install_github("r-lib/pkgdown")
+devtools::install_github("Pechli-Lab/SurvdigitizeR")
 ```
 
 ## Example
