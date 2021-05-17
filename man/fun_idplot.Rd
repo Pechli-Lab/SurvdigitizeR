@@ -13,7 +13,7 @@ fun_idplot(ls.fig, i.sen = 0.05)
 \item{i.sen}{a double between 0 and 1 indicating sensitivity (What doesn't count as white space) the higher the value the more aggressive in ignoring colours similar to white.}
 }
 \value{
-an list w/ 3 objects, ls.figcut: a list of three figure items in, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
+an list w/ 3 objects, ls.figcut: a list containing three figure items, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
 }
 \description{
 fun_idplot

@@ -17,6 +17,7 @@ if(!file.exists(FilePath)){
   stop(paste0("there is no file titled:", FilePath, " \n Are you sure the file path is spelled correctly."))
 }
 
+
 # checking if jpeg,jpg, or png
 if(stringr::str_detect(FilePath , "jpeg|jpg")){
 fig.arr <- jpeg::readJPEG(FilePath,native = F)

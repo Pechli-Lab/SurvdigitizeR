@@ -75,6 +75,11 @@ require(imager)
     return(r1)
   }))
 
+# allow for only one match
+  if(length( loc_of_breaks_x[!is.infinite(match_loc)]) != length(  x1.tbl$pxl_loc) ){
+  match_loc[duplicated(match_loc ) & is.finite(match_loc)] <- Inf
+  }
+
   x1.tbl$pxl_loc <- loc_of_breaks_x[!is.infinite(match_loc)]
   x1.tbl <-x1.tbl [which.max(x1.tbl$confidence ),]
 

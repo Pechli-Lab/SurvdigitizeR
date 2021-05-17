@@ -24,7 +24,7 @@ parent_digitizer(
 
 \item{sen}{: a value between 0 and 1 indicating how close a value has to be to white to be considered part of the background}
 
-\item{Wsen_i}{: word sensitivity for OCR word removal}
+\item{Wsen_i:}{word sensitivity for OCR word removal}
 
 \item{OCR_words_i:}{logical indicating if needed to remove words}
 
@@ -36,13 +36,13 @@ parent_digitizer(
 
 \item{x_incr:}{what increments do the ticks go up in the x-axis}
 
-\item{y_start_i:}{lowesst y-axis label}
+\item{y_start_i:}{lowest y-axis label}
 
-\item{y_end_i:}{highrst y-axis lebel}
+\item{y_end_i:}{highest y-axis label}
 
 \item{y_incr:}{what increments do the ticks go up in the y-axis}
 
-\item{Y_values_vertical:}{whether the y-axis labels are vertical}
+\item{Y_values_vertical:}{whether the y-axis labels are vertical (TRUE) or horizontal (FALSE)}
 }
 \value{
 a dataframe with id, times, St, curve

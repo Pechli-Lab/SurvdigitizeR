@@ -3,9 +3,9 @@
 \name{fun_colordetect}
 \alias{fun_colordetect}
 \title{fun_colordetect
-detects the location of each curve in the image using a kmeans algorithm}
+detects the location of each curve in the image using kmeans}
 \usage{
-fun_colordetect(fig.list, num_curves)
+fun_colordetect(fig.list, num_curves, HSV_colspace = F, BW_colspace = F)
 }
 \arguments{
 \item{fig.list}{output from fun_cleanplot}
@@ -17,7 +17,7 @@ comp1: a data frame with y,x,R,G,B color values and curve associated
 }
 \description{
 fun_colordetect
-detects the location of each curve in the image using a kmeans algorithm
+detects the location of each curve in the image using kmeans
 }
 \examples{
 # fun_colordetect(fig.list =  fig.list, num_curves = 3)

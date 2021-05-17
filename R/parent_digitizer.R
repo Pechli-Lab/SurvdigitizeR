@@ -2,16 +2,16 @@
 #'
 #' @param curve_location : curve location
 #' @param sen : a value between 0 and 1 indicating how close a value has to be to white to be considered part of the background
-#' @param Wsen_i : word sensitivity for OCR word removal
+#' @param Wsen_i: word sensitivity for OCR word removal
 #' @param OCR_words_i: logical indicating if needed to remove words
 #' @param num_curves1: the number of curves in an image
 #' @param x_start_i: lowest X-axis label value
 #' @param x_end_i: highest X-axis label value
 #' @param x_incr: what increments do the ticks go up in the x-axis
-#' @param y_start_i: lowesst y-axis label
-#' @param y_end_i: highrst y-axis lebel
+#' @param y_start_i: lowest y-axis label
+#' @param y_end_i: highest y-axis label
 #' @param y_incr: what increments do the ticks go up in the y-axis
-#' @param Y_values_vertical: whether the y-axis labels are vertical
+#' @param Y_values_vertical: whether the y-axis labels are vertical (TRUE) or horizontal (FALSE)
 #'
 #' @return a dataframe with id, times, St, curve
 #' @export

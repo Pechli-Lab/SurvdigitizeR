@@ -1,7 +1,7 @@
 #' fun_cleanplot
-#' Removes color values close to 0, also possible to remove text on plot
+#' Removes color values close to 0, also possible to remove text on plot, useful for gridlines on KM curves
 #' @param fig.lst a list with figures from fun_idplot
-#' @param i.sen how close a value is to one where we consider it a 0
+#' @param i.sen how close a value is to white to consider it part of the background
 #' @param Wsen Word sensitivity for image recognition
 #' @param OCR_words a logical indicating wether to attempt text recognition
 #'
@@ -15,6 +15,7 @@ fun_cleanplot  <- function(fig.lst, i.sen, Wsen, OCR_words){
   require(stringr)
   require(dplyr)
   require(xml2)
+
   fig.BW_flip <- fig.lst$fig.BW[dim(fig.lst$fig.BW)[1]:1,]
   fig.arr_flip <- fig.lst$fig.arr[dim(fig.lst$fig.arr)[1]:1,,]
 
@@ -43,7 +44,7 @@ fun_cleanplot  <- function(fig.lst, i.sen, Wsen, OCR_words){
 
 
 
-      # Removing identified colors
+      # Removing identified words
       for(i in 1:dim(res_ocr)[1] ){
         fig.BW_flip[res_ocr$y0[i]:res_ocr$y1[i],res_ocr$x0[i]:res_ocr$x1[i]] <- 1
         # Don't know how to turn hue into 0

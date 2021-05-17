@@ -3,7 +3,7 @@
 #' @param ls.fig list object created from fun_readsurv
 #' @param i.sen a double between 0 and 1 indicating sensitivity (What doesn't count as white space) the higher the value the more aggressive in ignoring colours similar to white.
 #'
-#' @return an list w/ 3 objects, ls.figcut: a list of three figure items in, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
+#' @return an list w/ 3 objects, ls.figcut: a list containing three figure items, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
 #' @export
 #'
 #' @examples # fun_idplot(ls.fig = fun_readout, i.sen = 10)
@@ -16,7 +16,7 @@ fun_idplot  <- function(ls.fig, i.sen = 0.05){
 
 # saving as fit.BW
 fig.BW  <- ls.fig$fig.BW
-# white is equal to 1 seeing how many have values
+# white is equal to 1 seeing how many have values are higher than sensitivitys
 v.colsums <- colSums(1-fig.BW > i.sen)
 # idenftifying rowSums number of pixels where 1-pixel > i.sen
 v.rowsums <- rowSums(1-fig.BW > i.sen)
@@ -24,8 +24,7 @@ v.rowsums <- rowSums(1-fig.BW > i.sen)
 # identify all the collumns w/ rowsums close to our max
 v.xaxis <-  which(v.colsums[which.max(v.colsums)]*0.95 < v.colsums)
 
-
-# going to try and fix w/ the following if statement
+# Possible for curve to be bounded in a box, checking if more than 1 x-axis
 if(any(diff(v.xaxis) > dim(fig.BW)[2]*0.4)){
   # Two xaxis
   x.br <- which(diff(v.xaxis) > dim(fig.BW)[1]*0.3)
@@ -50,6 +49,7 @@ if(any(diff(v.xaxis) > dim(fig.BW)[2]*0.4)){
 # identify all the rows w/ rowsums close to our max
 v.yaxis <-  which(v.rowsums[which.max(v.rowsums)]*0.95 < v.rowsums)
 
+# possible for curves to be bounded in a box checking for more than 1 y-axis
 if(any(diff(v.yaxis) > dim(fig.BW)[1]*0.4)){
   # Two xaxis
   y.br <- which(diff(v.yaxis) > dim(fig.BW)[1]*0.3)
