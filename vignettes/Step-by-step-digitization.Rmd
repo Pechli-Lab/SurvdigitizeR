@@ -14,14 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-
----
-title: "Step-by-step digitization"
-author: "David"
-date: "26/03/2021"
-output: rmarkdown::html_vignette
----
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -115,7 +107,7 @@ step4 %>%
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(step4 =step4 )
+step5 <- overlap_detect(step4 =step4)
 step5[[2]] %>% 
   ggplot(aes(x = x, y =y, color =as.factor(potential) )) +
   geom_point()
@@ -159,10 +151,9 @@ step7 <-get_tofinal(res_list = step6)
 ```
 
 ```{r}
- # Merging x and y-axis values with curve from gen_tofinal 
-  step9 <- fun_summary(final_list = step7,Step7_out =step8)
+# Merging x and y-axis values with curve from gen_tofinal 
+step9 <- fun_summary(final_list = step7,Step7_out =step8)
 
-  
 step9 %>% 
   ggplot(aes(x = time, y = St, color = curve, group = curve)) +
   geom_step() +
