@@ -1,5 +1,5 @@
 #' fun_colordetect
-#' detects the location of each curve in the image using kmeans
+#' detects the location of each curve in the image using medoids
 #' @param fig.list output from fun_cleanplot
 #' @param num_curves the number of curves that are on the figure to be digitized
 #'
@@ -7,11 +7,30 @@
 #' @export
 #'
 #' @examples # fun_colordetect(fig.list =  fig.list, num_curves = 3)
-fun_colordetect <- function(fig.list, num_curves, HSV_colspace = F, BW_colspace = F){
-  # detecting white space, as well as curves
-  cent <- num_curves + 1
+fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
+                            HSV_colspace = F, BW_colspace = F){
+
+  # exact number of color clusters required was given
+  if (!is.null(num_curves) && !is.null(black_marks)) {
+    centers <- num_curves + 1 + if(black_marks) 1 else 0
+    explore <- F
+
+  # number of curves known but existence of marks unknown
+  } else if (!is.null(num_curves)) {
+    cand_centers <- c(num_curves+1, num_curves+2)
+    explore <- T
+
+  # unknown number of curves and existence of marks
+  } else {
+
+    cand_centers <- 2:5
+    explore <- T
+  }
+
   new_array <-fig.list
-  require("gdata")
+  require("gdata", warn.conflicts=FALSE)
+  library("cluster")
+  library(data.table)
 
   # creating a long matrix with the y,x and R,G,B values of every point in our curve
   v1 <- names(unmatrix(new_array[,,1]))
@@ -19,95 +38,201 @@ fun_colordetect <- function(fig.list, num_curves, HSV_colspace = F, BW_colspace 
   col1[,1] <- as.numeric(str_remove_all(col1[,1],"r"))
   col1[,2] <- as.numeric(str_remove_all(col1[,2],"c"))
 
-  comp1 <-data.frame(y = as.numeric(col1[,1]),
-                     x = as.numeric(col1[,2]),
-                     R = as.vector(new_array[,,1]),
-                     G = as.vector(new_array[,,2]),
-                     B = as.vector(new_array[,,3]))
-
-  if(HSV_colspace){
-    ar.h <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-    ar.s <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-    ar.v <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-
-    for(i in 1:dim(new_array)[2]){
-      temp  <- rgb2hsv(new_array[,i,1],new_array[,i,2],new_array[,i,3])
-
-      ar.h[,i] <- temp[1,]
-      ar.s[,i] <- temp[2,]
-      ar.v[,i] <- temp[3,]
-
-
-    }
-
-    comp1 <-data.frame(y = as.numeric(col1[,1]),
-                       x = as.numeric(col1[,2]),
-                       H = as.vector(ar.h),
-                       S = as.vector(ar.s),
-                       V = as.vector(ar.v))
-
-
-  }
-
-
-  if(HSV_colspace){
-    ar.h <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-    ar.s <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-    ar.v <- matrix(data = 0, nrow = dim(new_array)[1], ncol = dim(new_array)[2])
-
-    for(i in 1:dim(new_array)[2]){
-      temp  <- rgb2hsv(new_array[,i,1],new_array[,i,2],new_array[,i,3])
-
-      ar.h[,i] <- temp[1,]
-      ar.s[,i] <- temp[2,]
-      ar.v[,i] <- temp[3,]
-
-
-    }
-
-    comp1 <-data.frame(y = as.numeric(col1[,1]),
-                       x = as.numeric(col1[,2]),
-                       H = as.vector(ar.h),
-                       S = as.vector(ar.s),
-                       V = as.vector(ar.v))
-
-
-  }
-
+  comp1 <- data.frame(y = as.numeric(col1[,1]),
+                      x = as.numeric(col1[,2]),
+                      t(rgb2hsv(as.vector(new_array[,,1]),
+                                as.vector(new_array[,,2]),
+                                as.vector(new_array[,,3]), maxColorValue = 1)))
 
 
 
   if(BW_colspace){
-    Clinear <-  0.2126*new_array[,,1] + 0.7152*new_array[,,2] + 0.0722*new_array[,,3]
+    Clinear <- 0.2126*new_array[,,1] + 0.7152*new_array[,,2] + 0.0722*new_array[,,3]
 
 
     comp1 <-data.frame(y = as.numeric(col1[,1]),
                        x = as.numeric(col1[,2]),
-                       BW = as.vector(Clinear))
-
-
+                       v = as.vector(Clinear),
+                       h = rep(0, length(col1[,2])))
   }
 
+  #' diag_connected
+  #' finds points that are well connected, biased on the diagonal x=-y
+  #' @param Data data df with x,y positions
+  #' @param clusters clustering ids for each element in data
+  #' @param neighb size of neighborhood to look into, in x/y units (default: 5)
+  #'
+  #' @return df of points with connectivity (higher is better)
+  #' @export
+  diag_connected <- function(Data, clusters, k = 20) {
 
+    Data$group <- clusters
 
-  # running kmeans algorithm to group into colours based on number of curves
-  out1 <- kmeans(x = comp1[,-c(1:2)], centers =cent)
+    # sample <- Data[sample(nrow(Data), 20), c('x', 'y', 'group')]
 
-  # remove group which is closest to white
-  gr_white <-which.min(rowSums((out1$centers - 1 )^2))
+    # order by x,y, get k previous and next
+    comp_df <- Data[order(Data$x,Data$y),]
+    df_slices <- list()
+    for (i in 1:k) {
+      temp_df <- comp_df
+      temp_df$x_n <- lag(comp_df$x, n = i)
+      temp_df$y_n <- lag(comp_df$y, n = i)
+      temp_df$group_n <- lag(comp_df$group, n = i)
+      df_slices[[i]] <- drop_na(temp_df)
+    }
+    for (i in 1:k) {
+      temp_df <- comp_df
+      temp_df$x_n <- lead(comp_df$x, n = i)
+      temp_df$y_n <- lead(comp_df$y, n = i)
+      temp_df$group_n <- lead(comp_df$group, n = i)
+      df_slices[[k+i]] <- drop_na(temp_df)
+    }
+    comp_df <- data.frame(rbindlist(df_slices))
 
+    # calculate distances, only keep <k> closest
+    comp_df$dist_group <- as.numeric(!comp_df$group==comp_df$group_n)
+    comp_df$dist_eucl <- sqrt((comp_df$x-comp_df$x_n)^2 + (comp_df$y-comp_df$y_n)^2)
+    comp_df$dist_diag <- abs(comp_df$x-comp_df$x_n + comp_df$y-comp_df$y_n)/sqrt(2)
+    comp_df$dist_both <- comp_df$dist_eucl + 2*comp_df$dist_diag
+    comp_df <- comp_df %>%
+      arrange(dist_both) %>%
+      group_by(x,y) %>% slice(1:k)
 
-  if(HSV_colspace | BW_colspace){
-    gr_white <- which.max(table(out1$cluster))
+    comp_df$dist_norm <- (comp_df$dist_both-min(comp_df$dist_both))/
+      (max(comp_df$dist_both)-min(comp_df$dist_both))
+    # comp_df$dist_norm <- scale(comp_df$dist_both, center = F)
 
+    # calculate connection metric
+    comp_df$metric <- abs(comp_df$dist_group)
+    knn_df <- comp_df %>% group_by(x,y,group) %>% summarise(knn = mean(comp_df$dist_both),
+                                                             .groups = "drop")
+    return(knn_df)
   }
 
-  # add group to original data.frame
-  comp1$group <- out1$cluster
+  #' get_clusters
+  #' performs medoid clustering and filters bg and black marks
+  #' @param centers nr of cluster centers
+  #' @param remove_black whether to find and remove black marks
+  #'
+  #' @return list[df, sd_score, con_score, bl_score] results df and eval metrics
+  #' @export
+  get_clusters <- function(centers, remove_black = F) {
 
-  comp1 <-comp1 %>%
-    filter(group != gr_white)
+    # running cluster algorithm to group into colours based on number of curves
 
-  # remove all cases where group != gr_white.
-  return(comp1)
+    # kmeans
+    # out1 <- kmeans(x = comp1[,-c(1:2)], centers = centers, nstart=3)
+    # centerpoints <- out1$centers[,-4]
+    # sizes <- out1$size
+    # cluster_data <- out1$cluster
+
+    # increase the effect of the value component
+    in1 <- comp1[,c('h','s','v')]
+    in1$v <- in1$v^2
+    in1$h <- in1$h^2
+
+    # medoids
+    out1 <- clara (x = in1, sampsize = 500, k = centers,
+                   stand = T,samples = 50)
+    centerpoints <- out1$medoids
+    sizes <- out1$clusinfo[,'size']
+    cluster_data <- out1$clustering
+
+    # find the most common color in the plot, that's the background
+    gr_white <- which.max(sizes)
+
+    # put into df, remove background color
+    cand_df <- data.frame(y = comp1$y, x = comp1$x, v=comp1$v, group = cluster_data)
+    cand_df <-cand_df %>%
+      filter(group != gr_white)
+
+    # if black tick marks specified, remove darkest group
+    # evaluate clustering step based on nr of removed and color darkness
+    bl_score <- 0
+    if(remove_black) {
+      gr_black <- which.min(centerpoints[,'v'])
+      bl_score <- nrow(cand_df[cand_df$group == gr_black,]) *
+        min(centerpoints[,'v'])
+
+      # TODO temporary
+      # remove tick marks for now
+      cand_df <- cand_df %>%
+        filter(group != gr_black)
+    }
+
+    # evaluate clustering based on y-axis deviation metric
+    # calculate standard y-axis deviation of same-x values
+    sd_df <- as_data_frame(cand_df %>% group_by(x,group) %>%
+                             summarise(sd = sd(y), .groups="drop"))
+    sd_df$sd[is.na(sd_df$sd)] <- 0
+    sd_score <- mean(sd_df$sd)
+
+    # evaluate clustering based on connectivity metric
+    # see cran.r-project.org/web/packages/clValid/vignettes/clValid.pdf
+    knn_df <- diag_connected(clusters = cand_df$group,
+                                 Data = cand_df[,c("y","x")])
+
+    # only keep well-clustered y values for every x
+    line_df <- as_data_frame(knn_df %>% group_by(x,group) %>%
+                               filter(knn == max(knn)))
+
+    # only keep well-clustered y values for every x
+    # line_df <- as_data_frame(cand_df %>% group_by(x,group) %>%
+    #                            summarise(y = median(y), .groups="drop"))
+
+    knn_score <- 1/as.numeric(mean(knn_df$knn^2)^(1/2))
+
+    return(list("df" = cand_df, "sd_score" = sd_score, "knn_score" = knn_score,
+                "bl_score" = bl_score))
+  }
+
+  # if all parameters were exactly defined, get result
+  if(!explore){
+    final_df <- get_clusters(centers)$df
+
+  # otherwise look for best configuration
+  } else {
+
+    # try all possible curve numbers, with or without black marks
+    candidates <- list()
+    nr_curves <- c()
+    sd_scores <- c()
+    knn_scores <- c()
+    bl_scores <- c()
+    i <- 1
+
+    for (centers in cand_centers) {
+      res <- get_clusters(centers, remove_black = F)
+      candidates[[i]] <- res$df
+      nr_curves[i] <- centers
+      sd_scores[i] <- res$sd_score
+      knn_scores[i] <- res$knn_score
+      bl_scores[i] <- res$bl_score
+      i <- i + 1
+    }
+
+    for (centers in cand_centers[2:length(cand_centers)]) {
+      res <- get_clusters(centers, remove_black = T)
+      candidates[[i]] <- res$df
+      nr_curves[i] <- centers
+      sd_scores[i] <- res$sd_score
+      knn_scores[i] <- res$knn_score
+      bl_scores[i] <- res$bl_score
+      i <- i + 1
+    }
+
+    # we want 4 bl a.k.a. 6th
+    scores <- as.vector(scale(sd_scores) + scale(knn_scores) + .5*scale(bl_scores)) + nr_curves * .5
+
+    # pick best fit based on last low score (most curves with good clustering)
+    final_df <- candidates[[which.min(scores)]]
+  }
+
+  final_df %>%
+    ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+    geom_point() +
+    theme_bw()
+
+  return(final_df)
 }
+
