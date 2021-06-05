@@ -228,10 +228,10 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
     final_df <- candidates[[which.min(scores)]]
   }
 
-  final_df %>%
-    ggplot(aes(x =x ,y =y, color = as.factor(group))) +
-    geom_point() +
-    theme_bw()
+  # final_df %>%
+  #   ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+  #   geom_point() +
+  #   theme_bw()
 
   return(final_df)
 }
