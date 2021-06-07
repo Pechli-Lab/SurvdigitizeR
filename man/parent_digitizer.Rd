@@ -16,7 +16,8 @@ parent_digitizer(
   y_start_i,
   y_end_i,
   y_incr,
-  Y_values_vertical
+  Y_values_vertical,
+  censoring_i
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ parent_digitizer(
 \item{OCR_words_i:}{logical indicating if needed to remove words}
 
 \item{num_curves1:}{the number of curves in an image}
+
+\item{censoring_i:}{locgical indicating if censoring is indicated by black marks}
 
 \item{x_start_i:}{lowest X-axis label value}
 

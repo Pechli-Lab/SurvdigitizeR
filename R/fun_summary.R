@@ -12,12 +12,12 @@ require(tidyr)
   final_list <- bind_rows(final_list)
 
 
-  if(Step7_out$X_0pixel < min(final_list$x)){
+  #if(Step7_out$X_0pixel < min(final_list$x)){
     final_list$x <-(final_list$x-Step7_out$X_0pixel)*Step7_out$x_increment
 
-  } else{
-    final_list$x <-(final_list$x)*Step7_out$x_increment
-  }
+  #} else{
+  #  final_list$x <-(final_list$x)*Step7_out$x_increment
+  #}
 
   if(max((final_list$y -Step7_out$Y_0pixel )*Step7_out$y_increment)   < 0.95){
 

@@ -2,7 +2,9 @@
 #' detects the location of each curve in the image using medoids
 #' @param fig.list output from fun_cleanplot
 #' @param num_curves the number of curves that are on the figure to be digitized
-#'
+#' @param black_marks  logical indicating whether censoring occurs in a diff color
+#' @param HSV_colspace  logical if to using HSV col_space
+#' @param BW_colspace logical to indicate if using BW_colspace
 #' @return comp1: a data frame with y,x,R,G,B color values and curve associated
 #' @export
 #'

@@ -11,6 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
+  eval=FALSE, include=FALSE,
  dev = "png", 
  dev.args = list(type = "cairo-png")
 )
