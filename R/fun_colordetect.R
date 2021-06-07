@@ -17,13 +17,18 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
 
   # number of curves known but existence of marks unknown
   } else if (!is.null(num_curves)) {
-    cand_centers <- c(num_curves+1, num_curves+2)
+
+    cand_params <- matrix(c(num_curves+1, num_curves+2, 0, 1), nrow=2, ncol=2)
     explore <- T
 
-  # unknown number of curves and existence of marks
+  # unknown number of curves and existence of black censor marks
   } else {
 
-    cand_centers <- 2:5
+    cand_curves <- 2:5
+    no_mark_removal <- cbind(cand_curves, rep(0, length(cand_curves)))
+    mark_removal <- cbind(cand_curves[2:length(cand_curves)],
+                          rep(1, length(cand_curves)-1))
+    cand_params <- rbind(no_mark_removal, mark_removal)
     explore <- T
   }
 
@@ -58,20 +63,17 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
 
   #' diag_connected
   #' finds points that are well connected, biased on the diagonal x=-y
-  #' @param Data data df with x,y positions
-  #' @param clusters clustering ids for each element in data
-  #' @param neighb size of neighborhood to look into, in x/y units (default: 5)
+  #' @param data_df data df with x,y positions
+  #' @param k number of nearest neighbors to compare with (default: 20)
   #'
-  #' @return df of points with connectivity (higher is better)
+  #' @return df of points with knn score (higher is better)
   #' @export
-  diag_connected <- function(Data, clusters, k = 20) {
+  diag_knn <- function(data_df, k = 20) {
 
-    Data$group <- clusters
-
-    # sample <- Data[sample(nrow(Data), 20), c('x', 'y', 'group')]
+    # sample <- data_df[sample(nrow(data_df), 20), c('x', 'y', 'group')]
 
     # order by x,y, get k previous and next
-    comp_df <- Data[order(Data$x,Data$y),]
+    comp_df <- data_df[order(data_df$x,data_df$y),]
     df_slices <- list()
     for (i in 1:k) {
       temp_df <- comp_df
@@ -110,11 +112,11 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
   }
 
   #' get_clusters
-  #' performs medoid clustering and filters bg and black marks
+  #' performs medoid clustering and filters bg and black censor marks
   #' @param centers nr of cluster centers
-  #' @param remove_black whether to find and remove black marks
+  #' @param remove_black whether to find and remove black censor marks
   #'
-  #' @return list[df, sd_score, con_score, bl_score] results df and eval metrics
+  #' @return list[df, bl_score] results dataframe, nr black censor marks removed
   #' @export
   get_clusters <- function(centers, remove_black = F) {
 
@@ -146,7 +148,7 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
     cand_df <-cand_df %>%
       filter(group != gr_white)
 
-    # if black tick marks specified, remove darkest group
+    # if black censor marks specified, remove darkest group
     # evaluate clustering step based on nr of removed and color darkness
     bl_score <- 0
     if(remove_black) {
@@ -155,10 +157,21 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
         min(centerpoints[,'v'])
 
       # TODO temporary
-      # remove tick marks for now
+      # remove censor marks for now
       cand_df <- cand_df %>%
         filter(group != gr_black)
     }
+
+    return(list("df" = cand_df, "bl_score" = bl_score))
+  }
+
+  #' eval_clusters
+  #' evaluates the quality of clustering by the distances between points
+  #' @param cand_df clustered points dataframe
+  #'
+  #' @return list[sd_score, knn_score] stand. dev and knn eval metrics
+  #' @export
+  eval_clusters <- function(cand_df) {
 
     # evaluate clustering based on y-axis deviation metric
     # calculate standard y-axis deviation of same-x values
@@ -169,21 +182,15 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
 
     # evaluate clustering based on connectivity metric
     # see cran.r-project.org/web/packages/clValid/vignettes/clValid.pdf
-    knn_df <- diag_connected(clusters = cand_df$group,
-                                 Data = cand_df[,c("y","x")])
+    knn_df <- diag_knn(data_df = cand_df[,c("y","x", "group")])
 
     # only keep well-clustered y values for every x
-    line_df <- as_data_frame(knn_df %>% group_by(x,group) %>%
-                               filter(knn == max(knn)))
-
-    # only keep well-clustered y values for every x
-    # line_df <- as_data_frame(cand_df %>% group_by(x,group) %>%
-    #                            summarise(y = median(y), .groups="drop"))
+    # line_df <- as_data_frame(knn_df %>% group_by(x,group) %>%
+    #                            filter(knn == max(knn)))
 
     knn_score <- 1/as.numeric(mean(knn_df$knn^2)^(1/2))
 
-    return(list("df" = cand_df, "sd_score" = sd_score, "knn_score" = knn_score,
-                "bl_score" = bl_score))
+    return(list("sd_score" = sd_score, "knn_score" = knn_score))
   }
 
   # if all parameters were exactly defined, get result
@@ -193,45 +200,32 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
   # otherwise look for best configuration
   } else {
 
-    # try all possible curve numbers, with or without black marks
+    # try all possible curve numbers, with or without black censor marks
     candidates <- list()
     nr_curves <- c()
     sd_scores <- c()
     knn_scores <- c()
     bl_scores <- c()
-    i <- 1
 
-    for (centers in cand_centers) {
-      res <- get_clusters(centers, remove_black = F)
+    # try all parameter combinations
+    for (i in 1:nrow(cand_params)) {
+      res <- get_clusters(cand_params[i,1], remove_black = as.logical(cand_params[i,2]))
       candidates[[i]] <- res$df
       nr_curves[i] <- centers
-      sd_scores[i] <- res$sd_score
-      knn_scores[i] <- res$knn_score
       bl_scores[i] <- res$bl_score
-      i <- i + 1
+      metrics <- eval_clusters(res$df)
+      sd_scores[i] <- metrics$sd_score
+      knn_scores[i] <- metrics$knn_score
     }
 
-    for (centers in cand_centers[2:length(cand_centers)]) {
-      res <- get_clusters(centers, remove_black = T)
-      candidates[[i]] <- res$df
-      nr_curves[i] <- centers
-      sd_scores[i] <- res$sd_score
-      knn_scores[i] <- res$knn_score
-      bl_scores[i] <- res$bl_score
-      i <- i + 1
-    }
+    # normalize and combine scores, prioritize fewer curves
+    # (more groups tend to separate better, giving false positives)
+    scores <- as.vector(scale(sd_scores) + scale(knn_scores) +
+                          .5*scale(bl_scores)) + .5*nr_curves
 
-    # we want 4 bl a.k.a. 6th
-    scores <- as.vector(scale(sd_scores) + scale(knn_scores) + .5*scale(bl_scores)) + nr_curves * .5
-
-    # pick best fit based on last low score (most curves with good clustering)
+    # pick best fit based on aggregated score
     final_df <- candidates[[which.min(scores)]]
   }
-
-  # final_df %>%
-  #   ggplot(aes(x =x ,y =y, color = as.factor(group))) +
-  #   geom_point() +
-  #   theme_bw()
 
   return(final_df)
 }
