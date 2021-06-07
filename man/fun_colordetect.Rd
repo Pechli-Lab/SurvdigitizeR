@@ -3,22 +3,50 @@
 \name{fun_colordetect}
 \alias{fun_colordetect}
 \title{fun_colordetect
-detects the location of each curve in the image using kmeans}
+detects the location of each curve in the image using medoids}
 \usage{
-fun_colordetect(fig.list, num_curves, HSV_colspace = F, BW_colspace = F)
+fun_colordetect(
+  fig.list,
+  num_curves = NULL,
+  black_marks = NULL,
+  HSV_colspace = F,
+  BW_colspace = F
+)
 }
 \arguments{
 \item{fig.list}{output from fun_cleanplot}
 
 \item{num_curves}{the number of curves that are on the figure to be digitized}
+
+\item{black_marks}{logical indicating whether censoring occurs in a diff color}
+
+\item{HSV_colspace}{logical if to using HSV col_space}
+
+\item{BW_colspace}{logical to indicate if using BW_colspace}
+
+\item{Data}{data df with x,y positions}
+
+\item{clusters}{clustering ids for each element in data}
+
+\item{neighb}{size of neighborhood to look into, in x/y units (default: 5)}
+
+\item{centers}{nr of cluster centers}
+
+\item{remove_black}{whether to find and remove black marks}
 }
 \value{
 comp1: a data frame with y,x,R,G,B color values and curve associated
+
+df of points with connectivity (higher is better)
+
+list\link{df, sd_score, con_score, bl_score} results df and eval metrics
 }
 \description{
 fun_colordetect
-detects the location of each curve in the image using kmeans
+detects the location of each curve in the image using medoids
 }
 \examples{
 # fun_colordetect(fig.list =  fig.list, num_curves = 3)
+diag_connected
+finds points that are well connected, biased on the diagonal x=-y
 }

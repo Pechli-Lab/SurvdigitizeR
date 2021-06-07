@@ -15,12 +15,12 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,eval=FALSE, include=FALSE)
 ```
 
 # Example of digitizer workflow
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 # if not previously installed 
 # library(devtools)
 # install()
@@ -89,74 +89,74 @@ fun_ggplot(step1$fig.BW) +
 ### Removing 'non KM portions of the plot'
 
 ```{r clean plot}
-step3 <-fun_cleanplot(fig.lst = step2$fig,i.sen = sen, Wsen = Wsen_i,OCR_words = OCR_words_i )
-fun_ggplot(step3$fig.BW_clean)
+#step3 <-fun_cleanplot(fig.lst = step2$fig,i.sen = sen, Wsen = #Wsen_i,OCR_words = OCR_words_i )
+#fun_ggplot(step3$fig.BW_clean)
 ```
 ### Detecting curves
 
 ```{r detecting-curves}
 
-step4 <-fun_colordetect(fig.list =step3$fig.arr_clean,num_curves = num_curves1)
-step4 %>% 
-  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
-  geom_point() +
-  theme_bw()
+#step4 <-fun_colordetect(fig.list =step3$fig.arr_clean,num_curves = #num_curves1)
+#step4 %>% 
+#  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+#  geom_point() +
+#  theme_bw()
 
 ```
 
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(step4 =step4)
-step5[[2]] %>% 
-  ggplot(aes(x = x, y =y, color =as.factor(potential) )) +
-  geom_point()
+#step5 <- overlap_detect(step4 =step4)
+#step5[[2]] %>% 
+#  ggplot(aes(x = x, y =y, color =as.factor(potential) )) +
+#  geom_point()
 
 ```
 
 ### Event detect
 
 ```{r}
- step6 <-eventdetect(res_list = step5)
-
- step6[[1]] %>% 
-   ggplot(aes(x =x ,y =y , color = curve)) +
-   geom_point()
- 
- 
- step6[[2]] %>% 
-   ggplot(aes(x =x ,y =y , color = curve)) +
-   geom_point()
- 
+# step6 <-eventdetect(res_list = step5)
+#
+# step6[[1]] %>% 
+#   ggplot(aes(x =x ,y =y , color = curve)) +
+#   geom_point()
+# 
+# 
+# step6[[2]] %>% 
+#   ggplot(aes(x =x ,y =y , color = curve)) +
+#   geom_point()
+# 
 ```
 
 ### Remove points that are not concave
 
 ```{r}
-step7 <-get_tofinal(res_list = step6)
+#step7 <-get_tofinal(res_list = step6)
 ```
 
 ### Mapping pixels to actual scales
 
 ```{r}
- step8 <- fun_range(X_start =x_start_i,
-                     X_end = x_end_i,
-                      X_increment = x_incr,
-                      Y_end = y_end_i,
-                      Y_start = y_start_i,
-                      Y_increment = y_incr,
-                      step1_bw =step1$fig.BW,step2_axis = step2$axis,
-                      Y_values_vertical = T)
-
+# step8 <- fun_range(X_start =x_start_i,
+#                     X_end = x_end_i,
+#                      X_increment = x_incr,
+#                      Y_end = y_end_i,
+#                      Y_start = y_start_i,
+#                      Y_increment = y_incr,
+#                      step1_bw =step1$fig.BW,step2_axis = step2$axis,
+#                      Y_values_vertical = T)
+#
 ```
 
 ```{r}
 # Merging x and y-axis values with curve from gen_tofinal 
-step9 <- fun_summary(final_list = step7,Step7_out =step8)
-
-step9 %>% 
-  ggplot(aes(x = time, y = St, color = curve, group = curve)) +
-  geom_step() +
-  theme_bw() 
+#step9 <- fun_summary(final_list = step7,Step7_out =step8)
+#
+#step9 %>% 
+#  ggplot(aes(x = time, y = St, color = curve, group = curve)) +
+#  geom_step() +
+#  theme_bw() 
 
 ```

@@ -5,6 +5,7 @@
 #' @param Wsen_i: word sensitivity for OCR word removal
 #' @param OCR_words_i: logical indicating if needed to remove words
 #' @param num_curves1: the number of curves in an image
+#' @param censoring_i: locgical indicating if censoring is indicated by black marks
 #' @param x_start_i: lowest X-axis label value
 #' @param x_end_i: highest X-axis label value
 #' @param x_incr: what increments do the ticks go up in the x-axis
@@ -29,7 +30,8 @@ parent_digitizer <- function(curve_location,
                             y_start_i,
                             y_end_i,
                             y_incr,
-                            Y_values_vertical){
+                            Y_values_vertical,
+                            censoring_i){
 
 
   # Step 1 read in curve
@@ -37,7 +39,7 @@ parent_digitizer <- function(curve_location,
   # Step 2 id plot location
   step2 <- fun_idplot(ls.fig = step1,i.sen = sen)
   step3 <-fun_cleanplot(fig.lst = step2$fig,i.sen = sen, Wsen = Wsen_i, OCR_words = OCR_words_i )
-  step4 <-fun_colordetect(fig.list =step3$fig.arr_clean,num_curves = num_curves1)
+  step4 <-fun_colordetect(fig.list =step3$fig.arr_clean,num_curves = num_curves1, black_marks = censoring_i)
   step5 <- overlap_detect(step4 =step4 )
   step6 <-eventdetect(res_list = step5)
   step7 <-get_tofinal(res_list = step6)
