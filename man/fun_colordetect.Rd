@@ -24,22 +24,24 @@ fun_colordetect(
 
 \item{BW_colspace}{logical to indicate if using BW_colspace}
 
-\item{Data}{data df with x,y positions}
+\item{data_df}{data df with x,y positions}
 
-\item{clusters}{clustering ids for each element in data}
-
-\item{neighb}{size of neighborhood to look into, in x/y units (default: 5)}
+\item{k}{number of nearest neighbors to compare with (default: 20)}
 
 \item{centers}{nr of cluster centers}
 
-\item{remove_black}{whether to find and remove black marks}
+\item{remove_black}{whether to find and remove black censor marks}
+
+\item{cand_df}{clustered points dataframe}
 }
 \value{
 comp1: a data frame with y,x,R,G,B color values and curve associated
 
-df of points with connectivity (higher is better)
+df of points with knn score (higher is better)
 
-list\link{df, sd_score, con_score, bl_score} results df and eval metrics
+list\link{df, bl_score} results dataframe, nr black censor marks removed
+
+list\link{sd_score, knn_score} stand. dev and knn eval metrics
 }
 \description{
 fun_colordetect
