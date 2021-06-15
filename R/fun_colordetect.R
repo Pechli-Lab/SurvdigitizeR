@@ -23,7 +23,15 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
     cand_params <- matrix(c(num_curves+1, num_curves+2, 0, 1), nrow=2, ncol=2)
     explore <- T
 
-  # unknown number of curves and existence of black censor marks
+  # unknown number of curves but known existence of black censor marks
+  } if (!is.null(black_marks)) {
+
+    cand_curves <- 2:5
+    cand_params <- cbind(cand_curves, rep(as.numeric(black_marks),
+                                          length(cand_curves)))
+    explore <- T
+
+    # unknown number of curves and existence of black censor marks
   } else {
 
     cand_curves <- 2:5
