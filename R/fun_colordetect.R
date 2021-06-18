@@ -205,7 +205,7 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
 
   # if all parameters were exactly defined, get result
   if(!explore){
-    final_df <- get_clusters(centers)$df
+    final_df <- get_clusters(num_curves)$df
 
   # otherwise look for best configuration
   } else {
@@ -221,7 +221,7 @@ fun_colordetect <- function(fig.list, num_curves = NULL, black_marks = NULL,
     for (i in 1:nrow(cand_params)) {
       res <- get_clusters(cand_params[i,1], remove_black = as.logical(cand_params[i,2]))
       candidates[[i]] <- res$df
-      nr_curves[i] <- centers
+      nr_curves[i] <- cand_params[i,1] - as.logical(cand_params[i,2])
       bl_scores[i] <- res$bl_score
       metrics <- eval_clusters(res$df)
       sd_scores[i] <- metrics$sd_score
