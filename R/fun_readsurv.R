@@ -2,7 +2,7 @@
 #' loads a jpeg or jpg or PNG file and turns into into arrays for further processing.
 #' @param FilePath character string indicating the location of the curve to be digitized
 #'
-#' @return List with three objects: fig.rbg (RBG array), fig.BW (BW array), fig.hsv array in HSV format
+#' @return fig.hsl array of pixels in HSL format (hue/saturation/lightness)
 #' @export
 #'
 #' @examples  # fun_readsurv(FilePath = "~/curve1.jpeg")
@@ -37,51 +37,59 @@ if(length(dim(fig.arr)) == 2 ){
   rm(temp)
 }
 
-# Converting RBGA images into rbg
+# Converting RBGA images into RGB
 if(dim(fig.arr)[3] > 3){
     fig.arr <-  fig.arr[,,-c(4:dim(fig.arr)[3])]
 }
 
 
-# Converting to greyscale
-# Using formula found in
-# https://stackoverflow.com/questions/17615963/standard-rgb-to-grayscale-conversion
-Clinear <-  0.2126*fig.arr[,,1] + 0.7152*fig.arr[,,2] + 0.0722*fig.arr[,,3]
-fig.BW <- apply(Clinear, MARGIN = 2,
-                function(x){ ret<-  ifelse(x <= 0.0031308 , 12.92*x, 1.055*x^(1/2.4) - 0.055)
-                return(ret)}
-                )
+# Finally, converting RGB to HSL
+# https://stackoverflow.com/a/58426404
+color.min <- pmin(fig.arr[,,1], fig.arr[,,2], fig.arr[,,3])
+color.max <- pmax(fig.arr[,,1], fig.arr[,,2], fig.arr[,,3])
+color.delta <- color.max - color.min
 
-
-# Converting to HSV
+# calculating hue
 ar.h <- matrix(data = 0, nrow = dim(fig.arr)[1], ncol = dim(fig.arr)[2])
-ar.s <- matrix(data = 0, nrow = dim(fig.arr)[1], ncol = dim(fig.arr)[2])
-ar.v <- matrix(data = 0, nrow = dim(fig.arr)[1], ncol = dim(fig.arr)[2])
 
-for(i in 1:dim(fig.arr)[2]){
-    temp  <- rgb2hsv(fig.arr[,i,1],fig.arr[,i,2],fig.arr[,i,3])
+# calculating hue for Max == Red
+rmax.mat <- which(color.delta != 0 & color.max == fig.arr[,,1], arr.ind=T)
+rmax_g <- fig.arr[cbind(rmax.mat, rep(2, dim(rmax.mat)[1]))]
+rmax_b <- fig.arr[cbind(rmax.mat, rep(3, dim(rmax.mat)[1]))]
+ar.h[rmax.mat] <-((rmax_g - rmax_b) / color.delta[rmax.mat]) %% 6
 
-    ar.h[,i] <- temp[1,]
-    ar.s[,i] <- temp[2,]
-    ar.v[,i] <- temp[3,]
+# calculating hue for Max == Green
+gmax.mat <- which(color.delta != 0 & color.max == fig.arr[,,2], arr.ind=T)
+gmax_b <- fig.arr[cbind(gmax.mat, rep(3, dim(gmax.mat)[1]))]
+gmax_r <- fig.arr[cbind(gmax.mat, rep(1, dim(gmax.mat)[1]))]
+ar.h[gmax.mat] <-((gmax_b - gmax_r) / color.delta[gmax.mat]) + 2
+
+# calculating hue for Max == Blue
+bmax.mat <- which(color.delta != 0 & color.max == fig.arr[,,3], arr.ind=T)
+bmax_r <- fig.arr[cbind(bmax.mat, rep(1, dim(bmax.mat)[1]))]
+bmax_g <- fig.arr[cbind(bmax.mat, rep(2, dim(bmax.mat)[1]))]
+ar.h[bmax.mat] <-((bmax_r - bmax_g) / color.delta[bmax.mat]) + 4
+
+ar.h <- round(ar.h*60)
+
+# calculating saturation
+ar.s <- color.delta / (1 - abs(2*ar.l - 1))
+ar.s[is.na(ar.s)] <- 0
+
+# calculating lightness
+ar.l <- (color.max + color.min) / 2
 
 
-}
-
-fig.hsv <- array(dim = dim(fig.arr))
-fig.hsv[,,1] <- ar.h
-fig.hsv[,,2] <- ar.v
-fig.hsv[,,3] <- ar.s
+fig.hsl <- array(dim = dim(fig.arr))
+fig.hsl[,,1] <- ar.h
+fig.hsl[,,2] <- ar.s
+fig.hsl[,,3] <- ar.l
 
 # Weird thing about raster images is that they read upside so have to flip on the horizontal axis
-fig.arr <- fig.arr[dim(fig.arr)[1]:1,, ]
-fig.BW <- fig.BW[dim(fig.BW)[1]:1, ]
-fig.hsv <- fig.hsv[dim(fig.hsv)[1]:1,, ]
+fig.hsl <- fig.hsl[dim(fig.hsl)[1]:1,, ]
 
 
-return(list(fig.arr = fig.arr,
-            fig.BW = fig.BW,
-            fig.hsv= fig.hsv))
+return(fig.hsl)
 }
 
 

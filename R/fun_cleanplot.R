@@ -1,29 +1,32 @@
 #' fun_cleanplot
-#' Removes color values close to 0, also possible to remove text on plot, useful for gridlines on KM curves
-#' @param fig.lst a list with figures from fun_idplot
+#' Removes color values close to white, also possible to remove text on plot, useful for gridlines on KM curves
+#' @param fig.hsl array of pixels in HSL format (hue/saturation/lightness)
 #' @param i.sen how close a value is to white to consider it part of the background
 #' @param Wsen Word sensitivity for image recognition
-#' @param OCR_words a logical indicating wether to attempt text recognition
+#' @param OCR_words a logical indicating whether to attempt text recognition
 #'
-#' @return fig.rgbclean: an array from removing pixels that are not relevant
+#' @return fig.df: a dataframe with x,y and h,s,l values for each remaining pixel
 #' @export
 #'
 #' @examples # fun_cleanplot(figlst, i.sen = 0.2, Wsen = 30, OCR_words = F)
-fun_cleanplot  <- function(fig.lst, i.sen, Wsen, OCR_words){
+fun_cleanplot  <- function(fig.hsl, i.sen, Wsen, OCR_words){
 
   require(tesseract)
   require(stringr)
   require(dplyr)
   require(xml2)
 
-  fig.BW_flip <- fig.lst$fig.BW[dim(fig.lst$fig.BW)[1]:1,]
-  fig.arr_flip <- fig.lst$fig.arr[dim(fig.lst$fig.arr)[1]:1,,]
-
 
 
   if(OCR_words == T){
+
+    # flip arrays for OCR
+    fig.l <- fig.hsl[,,3]
+    fig.l_flip <- fig.l[dim(fig.l)[1]:1,]
+    fig.hsl_flip <- fig.hsl[dim(fig.hsl)[1]:1,,]
+
     # Taken from a stack exchange basically takes xml output into a tibble
-    k1<- ocr( writeJPEG(fig.BW_flip),HOCR = T)
+    k1<- ocr( writeJPEG(fig.l_flip),HOCR = T)
     doc <- read_xml(k1)
     nodes <- xml_find_all(doc, ".//span[@class='ocrx_word']")
     words <- xml_text(nodes)
@@ -43,33 +46,28 @@ fun_cleanplot  <- function(fig.lst, i.sen, Wsen, OCR_words){
       res_ocr <- filter(res_ocr, confidence > Wsen)
 
 
-
       # Removing identified words
       for(i in 1:dim(res_ocr)[1] ){
-        fig.BW_flip[res_ocr$y0[i]:res_ocr$y1[i],res_ocr$x0[i]:res_ocr$x1[i]] <- 1
-        # Don't know how to turn hue into 0
-        fig.arr_flip[res_ocr$y0[i]:res_ocr$y1[i],res_ocr$x0[i]:res_ocr$x1[i],] <- 1
-
-
+        fig.hsl_flip[res_ocr$y0[i]:res_ocr$y1[i],res_ocr$x0[i]:res_ocr$x1[i],] <- c(0,0,1)
       }
-
     }
+
+    # flip array back
+    fig.hsl <- fig.hsl_flip[dim(fig.hsl_flip )[1]:1, ,]
   }
+
   # removing based on white sensitivity
-  white.mat <- 1-fig.BW_flip < i.sen
-  white.mat.ar <-  array(dim = c(dim(white.mat),3 ))
-  white.mat.ar[,,1] <- white.mat.ar[,,2] <-  white.mat.ar[,,3] <-  white.mat
+  fig.l <- fig.hsl[,,3]
+  non_bg.mat <- which(1 - fig.l > i.sen, arr.ind=T)
+  non_bg_h <- fig.hsl[cbind(non_bg.mat, rep(1, dim(non_bg.mat)[1]))]
+  non_bg_s <- fig.hsl[cbind(non_bg.mat, rep(2, dim(non_bg.mat)[1]))]
+  non_bg_l <- fig.hsl[cbind(non_bg.mat, rep(3, dim(non_bg.mat)[1]))]
 
+  # convert remaining points to dataframe
+  fig.df <- data.frame(non_bg.mat, as.numeric(non_bg_h), non_bg_s, non_bg_l)
+  colnames(fig.df) <- c("y", "x", "h", "s", "l")
 
-  fig.BW_flip[white.mat] <- 1
-  fig.arr_flip[white.mat.ar] <- 1
-
-  fig.BW_flip <- fig.BW_flip[dim(fig.BW_flip)[1]:1, ]
-  fig.arr_flip <- fig.arr_flip [dim(fig.arr_flip )[1]:1, ,]
-
-  return(list(fig.BW_clean = fig.BW_flip,
-              fig.arr_clean = fig.arr_flip))
-
+  return(fig.df)
 }
 
 

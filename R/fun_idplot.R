@@ -1,33 +1,33 @@
 #' fun_idplot
 #' Identifies plot location
-#' @param ls.fig list object created from fun_readsurv
+#' @param fig.hsl array of pixels in HSL format (hue/saturation/lightness)
 #' @param i.sen a double between 0 and 1 indicating sensitivity (What doesn't count as white space) the higher the value the more aggressive in ignoring colours similar to white.
 #'
-#' @return an list w/ 3 objects, ls.figcut: a list containing three figure items, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
+#' @return a list w/ 3 objects, fig.hsl: the array of pixels cropped to the axes, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
 #' @export
 #'
-#' @examples # fun_idplot(ls.fig = fun_readout, i.sen = 10)
-fun_idplot  <- function(ls.fig, i.sen = 0.05){
+#' @examples # fun_idplot(ls.fig = fun_readout, i.sen = 0.10)
+fun_idplot  <- function(fig.hsl, i.sen = 0.05){
 # To do
   # - make sure locations of zeroes doesnt break
   # - test w/ other curves
   # - possible for curve to be boxed in. create statement for that (ie v.rowsums)
 
 
-# saving as fit.BW
-fig.BW  <- ls.fig$fig.BW
+# getting the lightness value
+fig.l  <- fig.hsl[,,3]
 # white is equal to 1 seeing how many have values are higher than sensitivitys
-v.colsums <- colSums(1-fig.BW > i.sen)
+v.colsums <- colSums(1-fig.l > i.sen)
 # idenftifying rowSums number of pixels where 1-pixel > i.sen
-v.rowsums <- rowSums(1-fig.BW > i.sen)
+v.rowsums <- rowSums(1-fig.l > i.sen)
 
 # identify all the collumns w/ rowsums close to our max
 v.xaxis <-  which(v.colsums[which.max(v.colsums)]*0.95 < v.colsums)
 
 # Possible for curve to be bounded in a box, checking if more than 1 x-axis
-if(any(diff(v.xaxis) > dim(fig.BW)[2]*0.4)){
+if(any(diff(v.xaxis) > dim(fig.l)[2]*0.4)){
   # Two xaxis
-  x.br <- which(diff(v.xaxis) > dim(fig.BW)[1]*0.3)
+  x.br <- which(diff(v.xaxis) > dim(fig.l)[1]*0.3)
   x1 <- v.xaxis[1:x.br]
   x2 <- v.xaxis[-c(1:x.br)]
 
@@ -50,9 +50,9 @@ if(any(diff(v.xaxis) > dim(fig.BW)[2]*0.4)){
 v.yaxis <-  which(v.rowsums[which.max(v.rowsums)]*0.95 < v.rowsums)
 
 # possible for curves to be bounded in a box checking for more than 1 y-axis
-if(any(diff(v.yaxis) > dim(fig.BW)[1]*0.4)){
+if(any(diff(v.yaxis) > dim(fig.l)[1]*0.4)){
   # Two xaxis
-  y.br <- which(diff(v.yaxis) > dim(fig.BW)[1]*0.3)
+  y.br <- which(diff(v.yaxis) > dim(fig.l)[1]*0.3)
   y1 <- v.yaxis[1:y.br]
   y2 <- v.yaxis[-c(1:y.br)]
   yaxis <-  (max(y1) + 1):(min(y2)-1)
@@ -70,10 +70,6 @@ if(is.finite(i.yaxis.end)){
   }
 }
 
-ls.fig$fig.arr <-  ls.fig$fig.arr[yaxis,xaxis,]
-ls.fig$fig.hsv <-  ls.fig$fig.hsv[yaxis,xaxis,]
-ls.fig$fig.BW  <-  ls.fig$fig.BW[yaxis,xaxis]
-
-return(list(fig = ls.fig , axis= list(yaxis = yaxis, xaxis = xaxis)))
+return(list(fig.hsl = fig.hsl[yaxis,xaxis,], xaxis = xaxis, yaxis = yaxis))
 }
 
