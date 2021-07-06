@@ -8,7 +8,7 @@
 #' @export
 #'
 #' @examples # fun_colordetect(fig.df =  fig.df, num_curves = 3, black_marks = F)
-fun_colordetect <- function(fig.df, num_curves = NULL, black_marks = NULL){
+fun_colordetect <- function(fig.df, num_curves = NULL, black_marks = F){
 
   require("gdata", warn.conflicts=FALSE)
   library("cluster")

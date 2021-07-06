@@ -9,12 +9,9 @@
 overlap_detect <- function(fig.grp, k = 200){
 
   library(FNN)
-  window_min <- 20
-  window_max <- 100
-  curve_width <- 5
+  c <- 5
 
   fig.knn <- fig.grp[order(fig.grp$x, -fig.grp$y),]
-
   groups <- unique(fig.grp$group)
 
   # get knn indices and distances
@@ -24,7 +21,7 @@ overlap_detect <- function(fig.grp, k = 200){
   # calculate "well-placed" score for each point using knn similarity
   knn_samegroup <- t(apply(cbind(fig.knn$group, knn_groups), 1,
                            function(r) 2*as.integer(r[2:length(r)]==r[1])-1))
-  fig.knn$score <- apply(cbind(knn_samegroup, 1/knn$nn.dist), 1,
+  fig.knn$score <- apply(cbind(knn_samegroup, 1/knn$nn.dist^2), 1,
                      function(r) sum(r[1:k]*(r[1:2*k]))/k)
 
   # get curve average scores
@@ -43,69 +40,56 @@ overlap_detect <- function(fig.grp, k = 200){
     x_left <- points$x[1]
     y_top <- points$y[1]
     curve_points[[length(curve_points)+1]] <- c(x_left, y_top, g)
-    x_final <- max(points[points$y==min(points$y),]$x)
 
-    # stop at the lowest y of this group
-    while (x_left < x_final) {
+    # choose between rightmost and lowest x get final x value based on score
+    bottom_right_x <- max(points[points$y<=min(points$y)+5,]$x)
+    bottom_right_y <- min(points[points$x == bottom_right_x,]$y)
+    rightmost_x <- max(points$x)
+    rightmost_y <- min(points[points$x == rightmost_x,]$y)
+    if (sum(points[points$x>=bottom_right_x-c & points$x<=bottom_right_x+c &
+                   points$y>=bottom_right_y-c & points$y<=bottom_right_y+c,]) >
+        sum(points[points$x>=rightmost_x-c & points$x<=rightmost_x+c &
+                   points$y>=rightmost_y-c & points$y<=rightmost_y+c,])) {
+      x_final <- bottom_right_x
+    } else {
+      x_final <- rightmost_x
+    }
+    y_final <- min(points$y)
 
-      # determine window bottom right corner
-      x_right <- min(x_right + window_min, x_final)
-      while (x_right<x_final && (x_right-x_left) < window_max &&
-             sum(points$x==x_right) > curve_width &&
-             sum(points$x==x_right) == 0) {
-        x_right <- x_right +1
-      }
-      if(sum(points$x==x_right) != 0){
-        y_bottom <- min(points[points$x==x_right,]$y) # get y at right side
-      } else {
-        y_bottom <- min(points[points$x>x_left & points$x<=x_right,]$y) # get min y in window
-      }
 
-      # filter out invalid values above or below window
-      window_points <- points[points$x>=x_left & points$x<x_right &
-                                points$y>y_bottom & points$y<=y_top,]
+    x <- x_left
+    y <- y_top
+    # traverse the line and fix issues
+    while (x <= x_final && y>=y_final) {
 
-      # walk through the points in the window and correct issues
-      x <- x_left
-      y <- y_top
-      while (x < x_right | y > y_bottom) {
-
-        # checking the pixel below and the pixel to the right of current coords
-        p_down <- window_points[window_points$x == x & window_points$y == y-1,]
-        p_right <- window_points[window_points$x == x+1 & window_points$y == y,]
-        if (nrow(p_down) > 0 & nrow(p_right) > 0){
-          if(p_down$score > p_right$score){ # both exist, below fits better
-            y <- y-1
-          } else{ # both exist, right fits better
-            x <- x+1
-          }
-        } else if (nrow(p_down) > 0 & nrow(p_right) == 0){ # only below exists
+      # checking the pixel below and the pixel to the right of current coords
+      p_down <- points[points$x == x & points$y == y-1,]
+      p_right <- points[points$x == x+1 & points$y == y,]
+      if (nrow(p_down) > 0 & nrow(p_right) > 0){
+        if(p_down$score > p_right$score){ # both exist, below fits better
           y <- y-1
-        } else if (nrow(p_down) == 0 & nrow(p_right) > 0){ # only right exists
+        } else{ # both exist, right fits better
           x <- x+1
-        } else if (x >= x_right){ # reached right edge of window, go below
-          y <- y-1
-        } else if (y <= y_bottom){ # reached below edge of window, go right
-          x <- x+1
-        } else { # neither below or right exist, try to guess which is missing
-          score_down <- sum(window_points[window_points$x == x & window_points$y < y,]$score) +
-            sum(window_points[window_points$x > x & window_points$y == y-1,]$score)
-          score_right <- sum(window_points[window_points$x == x+1 & window_points$y < y,]$score) +
-            sum(window_points[window_points$x > x & window_points$y == y,]$score)
-
-          if(score_down > score_right){ # below fits better
-            y <- y-1
-          } else{ # right fits better
-            x <- x+1
-          }
         }
+      } else if (nrow(p_down) > 0 & nrow(p_right) == 0){ # only below exists
+        y <- y-1
+      } else if (nrow(p_down) == 0 & nrow(p_right) > 0){ # only right exists
+        x <- x+1
+      } else { # neither below or right exist, try to guess which is missing
+        score_down <- sum(points[points$x == x & points$y < y,]$score) +
+          sum(points[points$x > x & points$y == y-1,]$score)
+        score_right <- sum(points[points$x == x+1 & points$y < y,]$score) +
+          sum(points[points$x > x & points$y == y,]$score)
 
-        # add new coords to list
-        curve_points[[length(curve_points)+1]] <- c(x, y, g)
+        if(score_down > score_right){ # below fits better
+          y <- y-1
+        } else{ # right fits better
+          x <- x+1
+        }
       }
 
-      x_left <- x
-      y_top <- y
+      # add new coords to list
+      curve_points[[length(curve_points)+1]] <- c(x, y, g)
     }
 
     # put results in dataframe
