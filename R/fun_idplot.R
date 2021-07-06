@@ -70,6 +70,6 @@ if(is.finite(i.yaxis.end)){
   }
 }
 
-return(list(fig.hsl = fig.hsl[yaxis,xaxis,], xaxis = xaxis, yaxis = yaxis))
+return(list(fig.hsl = fig.hsl[yaxis,xaxis,], axis=list(xaxis = xaxis, yaxis = yaxis)))
 }
 

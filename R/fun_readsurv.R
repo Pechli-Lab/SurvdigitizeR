@@ -72,13 +72,12 @@ ar.h[bmax.mat] <-((bmax_r - bmax_g) / color.delta[bmax.mat]) + 4
 
 ar.h <- round(ar.h*60)
 
-# calculating saturation
-ar.s <- color.delta / (1 - abs(2*ar.l - 1))
-ar.s[is.na(ar.s)] <- 0
-
 # calculating lightness
 ar.l <- (color.max + color.min) / 2
 
+# calculating saturation
+ar.s <- color.delta / (1 - abs(2*ar.l - 1))
+ar.s[is.na(ar.s)] <- 0
 
 fig.hsl <- array(dim = dim(fig.arr))
 fig.hsl[,,1] <- ar.h

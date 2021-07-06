@@ -56,7 +56,7 @@ fun_colordetect_old <- function(fig.df, num_curves = NULL, black_marks = NULL){
 
     # sample <- data_df[sample(nrow(data_df), 20), c('x', 'y', 'group')]
 
-    # order by x,y, get k previous and next
+    # order by x,y, get k previous and k next
     comp_df <- data_df[order(data_df$x,data_df$y),]
     df_slices <- list()
     for (i in 1:k) {

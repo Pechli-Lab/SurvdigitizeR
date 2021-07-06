@@ -78,10 +78,10 @@ fun_ggplot(step1[,,3])
 step2 <- fun_idplot(fig.hsl = step1,i.sen = sen)
 
 fun_ggplot(step1[,,3]) +
-  geom_vline(aes(xintercept = c(min(step2$xaxis))), color = "green") +
-  geom_vline(aes(xintercept = c(max(step2$xaxis))), color = "green") +
-  geom_hline(aes(yintercept = c(max(step2$yaxis))), color = "green") +
-  geom_hline(aes(yintercept = c(min(step2$yaxis))), color = "green") +
+  geom_vline(aes(xintercept = c(min(step2$axis$xaxis))), color = "green") +
+  geom_vline(aes(xintercept = c(max(step2$axis$xaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(max(step2$axis$yaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(min(step2$axis$yaxis))), color = "green") +
   theme_bw()
 
 ```
@@ -102,11 +102,11 @@ step3 %>%
 
 ```{r detecting-curves}
 
-step4 <-fun_colordetect(fig.df = step3, num_curves = 3, black_marks = F)
+step4 <-fun_colordetect(fig.df = step3, num_curves = 2, black_marks = F)
 
 step4 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
- geom_point() +
+ geom_point(size = 0.01) +
  theme_bw()
 
 ```
@@ -114,18 +114,19 @@ step4 %>%
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(step4 =step4)
+step5 <- overlap_detect(fig.grp =step4)
 
-step5[[2]] %>%
- ggplot(aes(x = x, y =y, color =as.factor(potential) )) +
- geom_point()
+step5 %>%
+ ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+ geom_point(size = 0.01) +
+ theme_bw()
 
 ```
 
 ### Event detect
 
 ```{r}
-step6 <-eventdetect(res_list = step5)
+step6 <-eventdetect(res.df = step5)
 #
 step6[[1]] %>%
   ggplot(aes(x =x ,y =y , color = curve)) +
@@ -147,13 +148,14 @@ step7 <-get_tofinal(res_list = step6)
 ### Mapping pixels to actual scales
 
 ```{r}
+fig.BW <- step1[,,3]
 step8 <- fun_range(X_start =x_start_i,
                     X_end = x_end_i,
                      X_increment = x_incr,
                      Y_end = y_end_i,
                      Y_start = y_start_i,
                      Y_increment = y_incr,
-                     step1_bw =step1$fig.BW,step2_axis = step2$axis,
+                     step1_bw =fig.BW,step2_axis = step2$axis,
                      Y_values_vertical = T)
 
 ```

@@ -36,7 +36,7 @@ fun_colordetect <- function(fig.df, num_curves = NULL, black_marks = NULL){
   centerpoints <- out1$medoids
   sizes <- out1$clusinfo[,'size']
 
-  fig.grp <- fig.df
+  fig.grp <- fig.df[,c('x','y')]
   fig.grp$group <- out1$clustering
 
   return(fig.grp)
