@@ -44,7 +44,7 @@ require(imager)
   ### Detecting when x-axis row starts
   loc_y_start <- which.max(rowSums(fig_x <0.90))-1
   ### Detecting x-axis breaks
-  loc_of_breaks_x <-which(fig_x[(loc_y_start-1),] < 0.95)
+  loc_of_breaks_x <-which(fig_x[(loc_y_start-1),] < 0.90)
   ## removing continous x breaks
   loc_of_breaks_x <- loc_of_breaks_x[c(0,diff(loc_of_breaks_x)) != 1]
   diff1 <-diff(loc_of_breaks_x)
@@ -75,10 +75,10 @@ require(imager)
     return(r1)
   }))
 
-# allow for only one match
-  if(length( loc_of_breaks_x[!is.infinite(match_loc)]) != length(  x1.tbl$pxl_loc) ){
-  match_loc[duplicated(match_loc ) & is.finite(match_loc)] <- Inf
-  }
+# # allow for only one match
+#   if(length( loc_of_breaks_x[!is.infinite(match_loc)]) != length(  x1.tbl$pxl_loc) ){
+#   match_loc[duplicated(match_loc ) & is.finite(match_loc)] <- Inf
+#   }
 
   x1.tbl$pxl_loc <- loc_of_breaks_x[!is.infinite(match_loc)]
   x1.tbl <-x1.tbl [which.max(x1.tbl$confidence ),]
@@ -99,8 +99,8 @@ require(imager)
   }
 
   loc_x_start <- max(which(rowSums(fig_y < 0.95) == max(rowSums(fig_y < 0.95))))
-  y_breaks_loc <- which(fig_y[-c(1:loc_x_start),][1,] < 0.85)
-  y_breaks <- diff(which(fig_y[-c(1:loc_x_start),][1,] < 0.85))
+  y_breaks_loc <- which(fig_y[-c(1:loc_x_start),][1,] < 0.60)
+  y_breaks <- diff(which(fig_y[-c(1:loc_x_start),][1,] < 0.60))
 
 
   gr1 <- cumsum(!c(1,y_breaks) == 1)

@@ -22,16 +22,13 @@ require(tidyr)
   if(max((final_list$y -Step7_out$Y_0pixel )*Step7_out$y_increment)   < 0.95){
 
     final_list$y <-  (final_list$y )*Step7_out$y_increment
-    final_list$y_min <-  (final_list$y_min )*Step7_out$y_increment
 
   } else{
     final_list$y <-  (final_list$y - Step7_out$Y_0pixel)*Step7_out$y_increment
-    final_list$y_min <-  (final_list$y_min - Step7_out$Y_0pixel)*Step7_out$y_increment
   }
 
   if(max(final_list$y ) > 1){
     final_list$y <- final_list$y + (1-max(final_list$y ))
-    final_list$y_min <- final_list$y_min + (1-max(final_list$y ))
   }
   if(min(final_list$x ) < 0){
 

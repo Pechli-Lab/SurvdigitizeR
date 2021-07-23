@@ -37,20 +37,21 @@ parent_digitizer <- function(curve_location,
   # Step 1 read in curve
   step1 <-fun_readsurv(FilePath = curve_location)
   # Step 2 id plot location
-  step2 <- fun_idplot(ls.fig = step1,i.sen = sen)
-  step3 <-fun_cleanplot(fig.lst = step2$fig,i.sen = sen, Wsen = Wsen_i, OCR_words = OCR_words_i )
-  step4 <-fun_colordetect(fig.list =step3$fig.arr_clean,num_curves = num_curves1, black_marks = censoring_i)
-  step5 <- overlap_detect(step4 =step4 )
-  step6 <-eventdetect(res_list = step5)
+  step2 <- fun_idplot(fig.hsl = step1,i.sen = sen)
+  step3 <-fun_cleanplot(fig.hsl = step2$fig.hsl,i.sen = sen, Wsen = Wsen_i,OCR_words = OCR_words_i )
+  step4 <-fun_colordetect(fig.df = step3, num_curves = num_curves1, black_marks = censoring_i)
+  step5 <- overlap_detect(fig.grp =step4 )
+  step6 <-eventdetect(res.df = step5)
   step7 <-get_tofinal(res_list = step6)
+  fig.BW <- step1[,,3]
   step8 <- fun_range(X_start =x_start_i,
-                      X_end = x_end_i,
-                      X_increment = x_incr,
-                      Y_end = y_end_i,
-                      Y_start = y_start_i,
-                      Y_increment = y_incr,
-                      step1_bw =step1$fig.BW,step2_axis = step2$axis,
-                      Y_values_vertical = T)
+                     X_end = x_end_i,
+                     X_increment = x_incr,
+                     Y_end = y_end_i,
+                     Y_start = y_start_i,
+                     Y_increment = y_incr,
+                     step1_bw =fig.BW,step2_axis = step2$axis,
+                     Y_values_vertical = T)
   step9 <- fun_summary(final_list = step7,Step7_out =step8)
 
   return(step9)

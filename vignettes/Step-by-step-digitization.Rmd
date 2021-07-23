@@ -57,11 +57,11 @@ Wsen_i = 30
 OCR_words_i = F
 num_curves1 = 2
 x_start_i = 0
-x_end_i = 36
-x_incr = 3
+x_end_i = 300
+x_incr = 100
 y_start_i = 0
 y_end_i = 1
-y_incr = .1
+y_incr = .22
 Y_values_vertical = F
 ```
 
@@ -102,7 +102,7 @@ step3 %>%
 
 ```{r detecting-curves}
 
-step4 <-fun_colordetect(fig.df = step3, num_curves = 2, black_marks = F)
+step4 <-fun_colordetect(fig.df = step3, num_curves = num_curves1, black_marks = F)
 
 step4 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -162,7 +162,7 @@ step8 <- fun_range(X_start =x_start_i,
 
 ```{r}
 # Merging x and y-axis values with curve from gen_tofinal 
-step9 <- fun_summary(final_list = step7,Step7_out =step8)
+step9 <- fun_summary(final_list = step6,Step7_out =step8)
 
 step9 %>%
  ggplot(aes(x = time, y = St, color = curve, group = curve)) +

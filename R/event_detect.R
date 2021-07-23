@@ -13,9 +13,8 @@ eventdetect <- function(res.df){
   res.df2$curve <- res.df2$group
   res.df2 <- res.df2 %>%
     group_by(x, curve) %>%
-    summarise(y_min = min(y), y_max = max(y), .groups = 'drop')
+    summarise(y = max(y), .groups = 'drop')
 
-  res.df2$y <- res.df2$y_max - res.df2$y_min
 
   # splitting dataframe to list of <#curves> dataframes
   res_list <- res.df2%>% split(., .[, 'curve'])
