@@ -64,5 +64,3 @@ digtizer_output <- parent_digitizer(curve_location = here("vignettes","KMcurve.p
 head(digtizer_output) 
 ```
 
-### 
-

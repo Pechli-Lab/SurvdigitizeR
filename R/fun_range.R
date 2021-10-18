@@ -32,7 +32,7 @@ fun_ocrtotbl <- function(k1){
 #' @examples
 fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step1_bw,step2_axis,Y_values_vertical){
   ## function starts here
-require(imager)
+#require(imager)
   # Creating actual scales
   X_actual <- seq(X_start, X_end, by = X_increment)
   Y_actual <- seq(Y_start, Y_end, by = Y_increment)
