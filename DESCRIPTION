@@ -42,5 +42,6 @@ Imports:
     gdata
 Suggests: 
     knitr,
+    here,
     rmarkdown
 VignetteBuilder: knitr

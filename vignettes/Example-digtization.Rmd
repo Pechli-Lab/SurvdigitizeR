@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Example of digitizer workflow
 
-```{r set up}
+```{r set }
 # if not previously installed 
 # library(devtools)
 # install()
@@ -31,6 +31,7 @@ library(ggplot2)
 library(stringr)
 library(jpeg)
 library(knitr)
+library(here)
 ## We use this function for plotting arrays
 fun_ggplot <- function(array, sen = 0.9){
   array%>% as.data.frame() %>%
@@ -44,7 +45,7 @@ fun_ggplot <- function(array, sen = 0.9){
 ```
 
 ```{r}
-digtizer_output <- parent_digitizer(curve_location = here::here("vignettes","KMcurve.png"),
+digtizer_output <- parent_digitizer(curve_location = here("vignettes","KMcurve.png"),
                  sen = 0.3,
                  Wsen_i = 30,
                  OCR_words_i = T,
