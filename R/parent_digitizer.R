@@ -39,6 +39,8 @@ parent_digitizer <- function(curve_location,
   # Step 2 id plot location
   step2 <- fun_idplot(fig.hsl = step1,i.sen = sen)
   step3 <-fun_cleanplot(fig.hsl = step2$fig.hsl,i.sen = sen, Wsen = Wsen_i,OCR_words = OCR_words_i )
+  step3 <- step3 %>%
+    filter(l >= .1)
   step4 <-fun_colordetect(fig.df = step3, num_curves = num_curves1, black_marks = censoring_i)
   step5 <- overlap_detect(fig.grp =step4 )
   step6 <-eventdetect(res.df = step5)

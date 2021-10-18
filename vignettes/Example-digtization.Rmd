@@ -32,16 +32,7 @@ library(stringr)
 library(jpeg)
 library(knitr)
 library(here)
-## We use this function for plotting arrays
-fun_ggplot <- function(array, sen = 0.9){
-  array%>% as.data.frame() %>%
-    mutate(row = 1:n()) %>%
-    gather(-row, key= "column", value = "val") %>%
-    mutate(column = as.numeric(str_remove_all(column,"V"))) %>%
-    filter( val < sen) %>% 
-    ggplot(aes(x = column, y = row, fill = val )) +
-    geom_tile() 
-}
+
 ```
 
 ### Using parent_digitizer
@@ -62,5 +53,9 @@ digtizer_output <- parent_digitizer(curve_location = here("vignettes","KMcurve.p
                  Y_values_vertical =   T,censoring_i = F )
 
 head(digtizer_output) 
+
+digtizer_output %>% 
+  ggplot(aes(x = time, y=  St, color = curve, group = curve)) + 
+  geom_step()
 ```
 
