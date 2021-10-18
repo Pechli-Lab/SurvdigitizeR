@@ -1,10 +1,9 @@
-
 # SurvdigtizeR
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of SurvdigtizeR is to facilitate the digitization of kaplan meir survival curves.
+The survdigitzerR package takes as input JPEG or PNG kaplan-meier curves and provides time of events. Time of events can be used as input to generate pseudo patient level data that resembles the data used to generate the kaplan-meier curve. The survdigitzeR package is currently under development.  
 
 ## Installation
 
@@ -15,13 +14,11 @@ You can install the released version of SurvdigtizeR from github.
 devtools::install_github("Pechli-Lab/SurvdigitizeR")
 ```
 
-Or by opening the folder encompassing the project. 
+Or by opening the folder encompassing this project. 
 
 ``` r
-
 library(devtools)
 install()
-
 ```
 
 ## Example
