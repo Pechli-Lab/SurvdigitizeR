@@ -38,6 +38,7 @@ Imports:
     png,
     tesseract,
     xml2,
+    jpeg,
     gdata
 Suggests: 
     knitr,

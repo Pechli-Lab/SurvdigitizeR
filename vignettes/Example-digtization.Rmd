@@ -1,26 +1,22 @@
 ---
-title: "Step-by-step-digitization"
+title: "Example-digtization"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Step-by-step-digitization}
+  %\VignetteIndexEntry{Example-digtization}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-```{r, include = TRUE}
+```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
 ```
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE,eval=FALSE, include=FALSE)
-```
-
 # Example of digitizer workflow
 
-```{r eval=FALSE, include=FALSE}
+```{r set up}
 # if not previously installed 
 # library(devtools)
 # install()
