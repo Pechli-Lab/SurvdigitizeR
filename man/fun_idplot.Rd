@@ -5,20 +5,20 @@
 \title{fun_idplot
 Identifies plot location}
 \usage{
-fun_idplot(ls.fig, i.sen = 0.05)
+fun_idplot(fig.hsl, i.sen = 0.05)
 }
 \arguments{
-\item{ls.fig}{list object created from fun_readsurv}
+\item{fig.hsl}{array of pixels in HSL format (hue/saturation/lightness)}
 
 \item{i.sen}{a double between 0 and 1 indicating sensitivity (What doesn't count as white space) the higher the value the more aggressive in ignoring colours similar to white.}
 }
 \value{
-an list w/ 3 objects, ls.figcut: a list containing three figure items, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
+a list w/ 3 objects, fig.hsl: the array of pixels cropped to the axes, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
 }
 \description{
 fun_idplot
 Identifies plot location
 }
 \examples{
-# fun_idplot(ls.fig = fun_readout, i.sen = 10)
+# fun_idplot(ls.fig = fun_readout, i.sen = 0.10)
 }

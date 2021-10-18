@@ -14,7 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Example of digitizer workflow
+# Example of digitizer 
 
 ```{r set }
 # if not previously installed 
@@ -44,6 +44,10 @@ fun_ggplot <- function(array, sen = 0.9){
 }
 ```
 
+### Using parent_digitizer
+
+The digitizer is a wrapping of several functions. 
+
 ```{r}
 digtizer_output <- parent_digitizer(curve_location = here("vignettes","KMcurve.png"),
                  sen = 0.3,
@@ -59,4 +63,6 @@ digtizer_output <- parent_digitizer(curve_location = here("vignettes","KMcurve.p
 
 head(digtizer_output) 
 ```
+
+### 
 

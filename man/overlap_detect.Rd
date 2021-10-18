@@ -3,19 +3,19 @@
 \name{overlap_detect}
 \alias{overlap_detect}
 \title{overlap_detect
-this function detects potential overlap between curves}
+this function detects potential overlap between curves and "fills in the gaps"}
 \usage{
-overlap_detect(step4)
+overlap_detect(fig.grp, k = 200)
 }
 \arguments{
-\item{step4}{: output from fun_colordetection}
+\item{fig.grp:}{dataframe with x,y values and associated curve for each pixel}
 }
 \value{
-res_list: a dataframe with the detected values for all curves as well as potential overlap
+res.df: a dataframe with the detected x,y, group values for all curves
 }
 \description{
 overlap_detect
-this function detects potential overlap between curves
+this function detects potential overlap between curves and "fills in the gaps"
 }
 \examples{
 # overlap_detect(df_colordetect)

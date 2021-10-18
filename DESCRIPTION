@@ -37,6 +37,7 @@ Imports:
     jpeg,
     png,
     tesseract,
+    data.table,
     xml2,
     jpeg,
     gdata

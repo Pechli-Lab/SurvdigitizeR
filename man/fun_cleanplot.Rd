@@ -3,25 +3,25 @@
 \name{fun_cleanplot}
 \alias{fun_cleanplot}
 \title{fun_cleanplot
-Removes color values close to 0, also possible to remove text on plot, useful for gridlines on KM curves}
+Removes color values close to white, also possible to remove text on plot, useful for gridlines on KM curves}
 \usage{
-fun_cleanplot(fig.lst, i.sen, Wsen, OCR_words)
+fun_cleanplot(fig.hsl, i.sen, Wsen, OCR_words)
 }
 \arguments{
-\item{fig.lst}{a list with figures from fun_idplot}
+\item{fig.hsl}{array of pixels in HSL format (hue/saturation/lightness)}
 
 \item{i.sen}{how close a value is to white to consider it part of the background}
 
 \item{Wsen}{Word sensitivity for image recognition}
 
-\item{OCR_words}{a logical indicating wether to attempt text recognition}
+\item{OCR_words}{a logical indicating whether to attempt text recognition}
 }
 \value{
-fig.rgbclean: an array from removing pixels that are not relevant
+fig.df: a dataframe with x,y and h,s,l values for each remaining pixel
 }
 \description{
 fun_cleanplot
-Removes color values close to 0, also possible to remove text on plot, useful for gridlines on KM curves
+Removes color values close to white, also possible to remove text on plot, useful for gridlines on KM curves
 }
 \examples{
 # fun_cleanplot(figlst, i.sen = 0.2, Wsen = 30, OCR_words = F)

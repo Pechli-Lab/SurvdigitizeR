@@ -5,13 +5,13 @@
 \title{eventdetect
 detects potential events}
 \usage{
-eventdetect(res_list)
+eventdetect(res.df)
 }
 \arguments{
-\item{res_list}{: output from overlap_detect}
+\item{res.df}{: a dataframe with x, y and group values}
 }
 \value{
-res_list2: a dataframe with potential x, and y values
+res_list: a list with a dataframe for each curve
 }
 \description{
 eventdetect

@@ -11,7 +11,7 @@ fun_readsurv(FilePath)
 \item{FilePath}{character string indicating the location of the curve to be digitized}
 }
 \value{
-List with three objects: fig.rbg (RBG array), fig.BW (BW array), fig.hsv array in HSV format
+fig.hsl array of pixels in HSL format (hue/saturation/lightness)
 }
 \description{
 fun_readsurv

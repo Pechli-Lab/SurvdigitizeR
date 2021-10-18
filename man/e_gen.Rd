@@ -5,12 +5,10 @@
 \title{e_gen
 This is the function that for each y estimate generates how close the other values look likea survival curve if you were to remove that y value.}
 \usage{
-e_gen(y, cor1)
+e_gen(y)
 }
 \arguments{
 \item{y:}{y values}
-
-\item{cor1:}{wether overlap or original y values}
 }
 \value{
 ret_v: a vector with the ith element indicating how close the other set of points resemble a survival curve on the removal of the y value
@@ -20,5 +18,5 @@ e_gen
 This is the function that for each y estimate generates how close the other values look likea survival curve if you were to remove that y value.
 }
 \examples{
-# e_gen ( y = c(1,0.5,1,0.1), cor = c(T,T,F,T))
+# e_gen ( y = c(1,0.5,1,0.1))
 }
