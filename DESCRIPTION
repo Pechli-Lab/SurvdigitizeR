@@ -40,7 +40,9 @@ Imports:
     data.table,
     xml2,
     jpeg,
-    gdata
+    gdata,
+    FNN,
+    cluster
 Suggests: 
     knitr,
     here,
