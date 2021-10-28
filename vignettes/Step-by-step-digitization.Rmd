@@ -51,37 +51,40 @@ fun_ggplot <- function(array, sen = 0.9){
 
 
 ```{r function inputs}
-curve_loc = here::here("vignettes","Test2OS.jpeg")
-sen = 0.1
-Wsen_i = 30
-OCR_words_i = F
-num_curves1 = 2
-x_start_i = 0
-x_end_i = 300
-x_incr = 100
-y_start_i = 0
-y_end_i = 1
-y_incr = .22
-Y_values_vertical = F
+img_path = here::here("vignettes","Test2OS.jpeg")
+bg_lightness = 0.1
+attempt_OCR = F
+word_sensitivity = 30
+num_curves = 2
+censoring = F
+x_start = 0
+x_end = 36
+x_increment = 3 # increment between EVERY tick, including minor ones
+y_start = 10
+y_end = 100
+y_increment = 10
+y_text_vertical = F
 ```
 
 ### Reading in KM curves
 
 ```{r reading}
 
-step1 <-fun_readsurv(FilePath = curve_loc)
+step1 <-img_read(path = img_path)
 fun_ggplot(step1[,,3])
 
 ```
 
 ```{r}
-step2 <- fun_idplot(fig.hsl = step1,i.sen = sen)
+step2 <- axes_identify(fig.hsl = step1,bg_lightness = bg_lightness)
+fig.cropped <- step2$fig.hsl
+axes <- step2$axes
 
 fun_ggplot(step1[,,3]) +
-  geom_vline(aes(xintercept = c(min(step2$axis$xaxis))), color = "green") +
-  geom_vline(aes(xintercept = c(max(step2$axis$xaxis))), color = "green") +
-  geom_hline(aes(yintercept = c(max(step2$axis$yaxis))), color = "green") +
-  geom_hline(aes(yintercept = c(min(step2$axis$yaxis))), color = "green") +
+  geom_vline(aes(xintercept = c(min(axes$xaxis))), color = "green") +
+  geom_vline(aes(xintercept = c(max(axes$xaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(max(axes$yaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(min(axes$yaxis))), color = "green") +
   theme_bw()
 
 ```
@@ -90,7 +93,7 @@ fun_ggplot(step1[,,3]) +
 
 ```{r clean plot}
 
-step3 <-fun_cleanplot(fig.hsl = step2$fig.hsl,i.sen = sen, Wsen = Wsen_i,OCR_words = OCR_words_i )
+step3 <- fig_clean(fig.hsl = fig.cropped, bg_lightness = bg_lightness, attempt_OCR = attempt_OCR, word_sensitivity = word_sensitivity )
 
 step3 %>%
  ggplot(aes(x =x ,y =y)) +
@@ -102,7 +105,7 @@ step3 %>%
 
 ```{r detecting-curves}
 
-step4 <-fun_colordetect(fig.df = step3, num_curves = num_curves1, black_marks = F)
+step4 <-color_cluster(fig.df = step3, num_curves = num_curves, censoring = censoring)
 
 step4 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -114,7 +117,7 @@ step4 %>%
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(fig.grp =step4)
+step5 <- overlap_detect(fig.grp = step4)
 
 step5 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -126,7 +129,7 @@ step5 %>%
 ### Event detect
 
 ```{r}
-step6 <-eventdetect(res.df = step5)
+step6 <- step6 <-lines_isolate(fig.curves = step5)
 #
 step6[[1]] %>%
   ggplot(aes(x =x ,y =y , color = curve)) +
@@ -139,32 +142,26 @@ step6[[2]] %>%
 # 
 ```
 
-### Remove points that are not concave
-
-```{r}
-step7 <-get_tofinal(res_list = step6)
-```
-
 ### Mapping pixels to actual scales
 
 ```{r}
-fig.BW <- step1[,,3]
-step8 <- fun_range(X_start =x_start_i,
-                    X_end = x_end_i,
-                     X_increment = x_incr,
-                     Y_end = y_end_i,
-                     Y_start = y_start_i,
-                     Y_increment = y_incr,
-                     step1_bw =fig.BW,step2_axis = step2$axis,
-                     Y_values_vertical = T)
+step7 <- range_detect(step1_fig = step1,
+                      step2_axes = step2$axes,
+                      x_start = x_start,
+                      x_end = x_end,
+                      x_increment = x_increment,
+                      y_start = y_start,
+                      y_end = y_end,
+                      y_increment = y_increment,
+                      y_text_vertical = y_text_vertical)
 
 ```
 
 ```{r}
-# Merging x and y-axis values with curve from gen_tofinal 
-step9 <- fun_summary(final_list = step6,Step7_out =step8)
+# Merging x and y-axis values with curves
+step8 <- fig_summarize(lines_vector = step6, range_list = step7)
 
-step9 %>%
+step8 %>%
  ggplot(aes(x = time, y = St, color = curve, group = curve)) +
  geom_step() +
  theme_bw()

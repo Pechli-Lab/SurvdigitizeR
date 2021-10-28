@@ -1,21 +1,21 @@
-#' fun_colordetect
-#' detects the location of each curve in the image using medoids
+#' color_cluster
+#' groups pixels of each curve in the image based on color using k-medoids clustering
 #' @param fig.df a dataframe with x,y and h,s,l values for each pixel
 #' @param num_curves the number of curves that are on the figure to be digitized
-#' @param black_marks  logical indicating whether censoring occurs in a diff color
+#' @param censoring  logical indicating whether censoring occurs in a different color (usually black)
 #'
-#' @return fig.grp: a dataframe with x,y,h,s,l values and associated curve for each pixel
+#' @return fig.grp: a dataframe with x,y,h,s,l values and associated group (curve) for each pixel
 #' @export
 #'
-#' @examples # fun_colordetect(fig.df =  fig.df, num_curves = 3, black_marks = F)
-fun_colordetect <- function(fig.df, num_curves = NULL, black_marks = F){
+#' @examples # color_cluster(fig.df =  fig.df, num_curves = 3, censoring = F)
+color_cluster <- function(fig.df, num_curves = 3, censoring = F){
 
   require("gdata", warn.conflicts=FALSE)
   library("cluster")
   library(data.table)
 
-  # if black_marks then remove darkest color
-  if(black_marks){
+  # if censoring then remove darkest color
+  if(censoring){
     fig.df[fig.df$l < 0.2,]
   }
 
