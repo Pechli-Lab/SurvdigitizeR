@@ -67,7 +67,11 @@ fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensit
   # convert remaining points to dataframe
   fig.df <- data.frame(non_bg.mat, as.numeric(non_bg_h), non_bg_s, non_bg_l)
   colnames(fig.df) <- c("y", "x", "h", "s", "l")
+  if(attempt_OCR){
 
+    fig.df <- fig.df[fig.df$l > 0.1,]
+
+  }
   return(fig.df)
 }
 
