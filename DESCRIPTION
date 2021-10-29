@@ -37,9 +37,14 @@ Imports:
     jpeg,
     png,
     tesseract,
+    data.table,
     xml2,
-    gdata
+    jpeg,
+    gdata,
+    FNN,
+    cluster
 Suggests: 
     knitr,
+    here,
     rmarkdown
 VignetteBuilder: knitr
