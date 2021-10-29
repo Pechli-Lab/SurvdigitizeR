@@ -64,7 +64,8 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
   }
   # know that x's go up by x_increment pixels, know the location of the x_increment need to anchor somehow
   xaxis_cimg <- imager::as.cimg(fig_x[1:loc_y_start,])
-  x1<- ocr(jpeg::writeJPEG(image =  xaxis_gray[,,1,1]),HOCR = T)
+  xaxis_gray <- as.matrix(xaxis_cimg)
+  x1<- ocr(jpeg::writeJPEG(image =  xaxis_gray),HOCR = T)
   x1.tbl <-  fun_ocrtotbl(x1)
 
   ## Which of my words where properly detected by OCR
@@ -137,7 +138,8 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
   }
 
   yaxis_cimg <- as.cimg(fig_y[-c(1:loc_x_start),])
-  y1<- ocr(jpeg::writeJPEG(image =  yaxis_gray[,,1,1]),HOCR = T)
+  yaxis_gray <- as.matrix(yaxis_cimg)
+  y1<- ocr(jpeg::writeJPEG(image =  t(yaxis_gray)),HOCR = T)
   y1.tbl <-  fun_ocrtotbl(y1)
   ## TODO Fix this
   y1.tbl <-y1.tbl[as.numeric(y1.tbl$word) %in% Y_actual,]
