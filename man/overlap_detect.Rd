@@ -3,20 +3,22 @@
 \name{overlap_detect}
 \alias{overlap_detect}
 \title{overlap_detect
-this function detects potential overlap between curves and "fills in the gaps"}
+detects potential overlap between curves and "fills in the gaps" using knn similarity}
 \usage{
-overlap_detect(fig.grp, k = 200)
+overlap_detect(fig.grp, nr_neighbors = 100)
 }
 \arguments{
 \item{fig.grp:}{dataframe with x,y values and associated curve for each pixel}
+
+\item{nr_neighbors:}{how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)}
 }
 \value{
 res.df: a dataframe with the detected x,y, group values for all curves
 }
 \description{
 overlap_detect
-this function detects potential overlap between curves and "fills in the gaps"
+detects potential overlap between curves and "fills in the gaps" using knn similarity
 }
 \examples{
-# overlap_detect(df_colordetect)
+# overlap_detect(fig.dataframe, nr_neighbors = 100)
 }

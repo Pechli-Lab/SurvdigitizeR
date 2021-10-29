@@ -14,32 +14,35 @@ fun_ocrtotbl <- function(k1){
   return(res_ocr)
 }
 
-#' fun_range
+#' range_detect
 #' detects how X and y pixel values map to time and survival values respectively
-#' @param X_start what does the x-axis start usually 0
-#' @param X_end  what does the x-axis end in
-#' @param X_increment what does it go up by
-#' @param Y_start what does the y-axis start
-#' @param Y_increment what does it go up by
-#' @param Y_end  what does it end in
-#' @param step1_bw  from previous step
-#' @param step2_axis from previous step
-#' @param Y_values_vertical whether the y -axis labels are vertical or horizontal: does this make sense)
+#' @param step1_fig  figure array from previous step
+#' @param step2_axes axes list from previous step
+#' @param x_start what does the x-axis start usually 0
+#' @param x_end  what does the x-axis end in
+#' @param x_increment what does it go up by (Note: increment between EVERY tick, including minor ones)
+#' @param y_start what does the y-axis start
+#' @param y_increment what does it go up by (Note: increment between EVERY tick, including minor ones)
+#' @param y_end  what does it end in
+#' @param y_text_vertical whether the y -axis label text is vertical or horizontal)
 #'
-#' @return # a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and X_increment.
+#' @return # a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and x_increment.
 #' @export
 #'
 #' @examples
-fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step1_bw,step2_axis,Y_values_vertical){
-  ## function starts here
-#require(imager)
+range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
+                          y_start, y_increment, y_end, y_text_vertical){
+
+
+  require(imager)
   # Creating actual scales
-  X_actual <- seq(X_start, X_end, by = X_increment)
-  Y_actual <- seq(Y_start, Y_end, by = Y_increment)
+  X_actual <- seq(x_start, x_end, by = x_increment)
+  Y_actual <- seq(y_start, y_end, by = y_increment)
 
   ## creating subsets which are the x-axis labels and the y-axis labels
-  fig_x <-step1_bw[-step2_axis$yaxis,step2_axis$xaxis]
-  fig_y <-step1_bw[step2_axis$yaxis,-step2_axis$xaxis]
+  fig_bw <- step1_fig[,,3]
+  fig_x <-fig_bw[-step2_axes$yaxis,step2_axes$xaxis]
+  fig_y <-fig_bw[step2_axes$yaxis,-step2_axes$xaxis]
 
   ### Detecting when x-axis row starts
   loc_y_start <- which.max(rowSums(fig_x <0.90))-1
@@ -52,12 +55,17 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
   # geom_vline(xintercept = loc_of_breaks_x)
 
   # getting the increase in x-breaks
-  x_increment  <-as.numeric(names(which.max(table(diff(loc_of_breaks_x)))))
-  x_increment<- mean(diff1[diff1 >=  median(diff1)*0.95  & diff1 <= median(diff1)/0.95])
+  x_pixels_increment  <-as.numeric(names(which.max(table(diff(loc_of_breaks_x)))))
+  x_pixels_increment<- mean(diff1[diff1 >=  median(diff1)*0.95  & diff1 <= median(diff1)/0.95])
+
+  # if nr of ticks found is nr of actual ticks -1, 0 tick is missing, add it
+  if(length(loc_of_breaks_x) == length(X_actual)-1){
+    loc_of_breaks_x <- c(loc_of_breaks_x[1]-x_pixels_increment, loc_of_breaks_x)
+  }
   # know that x's go up by x_increment pixels, know the location of the x_increment need to anchor somehow
   xaxis_cimg <- imager::as.cimg(fig_x[1:loc_y_start,])
-  xaxis_gray <-   grayscale( xaxis_cimg)
-  x1<- ocr(jpeg::writeJPEG(image =  xaxis_gray[,,1,1]),HOCR = T)
+  xaxis_gray <- as.matrix(xaxis_cimg)
+  x1<- ocr(jpeg::writeJPEG(image =  xaxis_gray),HOCR = T)
   x1.tbl <-  fun_ocrtotbl(x1)
 
   ## Which of my words where properly detected by OCR
@@ -75,16 +83,16 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
     return(r1)
   }))
 
-# # allow for only one match
-#   if(length( loc_of_breaks_x[!is.infinite(match_loc)]) != length(  x1.tbl$pxl_loc) ){
-#   match_loc[duplicated(match_loc ) & is.finite(match_loc)] <- Inf
-#   }
+  # # allow for only one match
+  #   if(length( loc_of_breaks_x[!is.infinite(match_loc)]) != length(  x1.tbl$pxl_loc) ){
+  #   match_loc[duplicated(match_loc ) & is.finite(match_loc)] <- Inf
+  #   }
 
   x1.tbl$pxl_loc <- loc_of_breaks_x[!is.infinite(match_loc)]
   x1.tbl <-x1.tbl [which.max(x1.tbl$confidence ),]
 
   ## The start
-  X_0pixel <- (length(seq(0, x1.tbl$word, by = X_increment))-1)*x_increment - x1.tbl$pxl_loc
+  X_0pixel <- (length(seq(0, x1.tbl$word, by = x_increment))-1)*x_pixels_increment - x1.tbl$pxl_loc
 
   if(X_0pixel < 0){
     X_0pixel <- min(loc_of_breaks_x)
@@ -94,13 +102,14 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
 
   ## Step 2 detect line breaks location
 
-  if(Y_values_vertical){
+  if(y_text_vertical){
     fig_y <-t(fig_y[,dim(fig_y)[2]:1])
   }
 
-  loc_x_start <- max(which(rowSums(fig_y < 0.95) == max(rowSums(fig_y < 0.95))))
-  y_breaks_loc <- which(fig_y[-c(1:loc_x_start),][1,] < 0.60)
-  y_breaks <- diff(which(fig_y[-c(1:loc_x_start),][1,] < 0.60))
+  loc_x_start <- which.max(colSums(fig_y <0.90))-1
+  ### Detecting y-axis breaks
+  y_breaks_loc <- which(fig_y[,(loc_x_start-1)] < 0.60)
+  y_breaks <- diff(y_breaks_loc)
 
 
   gr1 <- cumsum(!c(1,y_breaks) == 1)
@@ -122,9 +131,15 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
 
   break_indicator_y <-as.numeric(names(table(diff(y_breaks_act))))[which.max(table(diff(y_breaks_act)))]
   break_indicator_y <- round(break_indicator_y)
+
+  # if nr of ticks found is nr of actual ticks -1, 0 tick is missing, add it
+  if(length(y_breaks_act) == length(Y_actual)-1){
+    y_breaks_act <- c(y_breaks_act[1]-break_indicator_y, y_breaks_act)
+  }
+
   yaxis_cimg <- as.cimg(fig_y[-c(1:loc_x_start),])
-  yaxis_gray <-   grayscale( yaxis_cimg)
-  y1<- ocr(jpeg::writeJPEG(image =  yaxis_gray[,,1,1]),HOCR = T)
+  yaxis_gray <- as.matrix(yaxis_cimg)
+  y1<- ocr(jpeg::writeJPEG(image =  t(yaxis_gray)),HOCR = T)
   y1.tbl <-  fun_ocrtotbl(y1)
   ## TODO Fix this
   y1.tbl <-y1.tbl[as.numeric(y1.tbl$word) %in% Y_actual,]
@@ -146,7 +161,7 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
 
     ## The start
     if( y1.tbl$word != 0){
-      Y_0pixel <- (length(seq(0, y1.tbl$word, by = Y_increment))-1)*break_indicator_y - y1.tbl$pxl_loc
+      Y_0pixel <- (length(seq(0, y1.tbl$word, by = y_increment))-1)*break_indicator_y - y1.tbl$pxl_loc
 
     } else{
       Y_0pixel <- y1.tbl$pxl_loc
@@ -155,22 +170,31 @@ fun_range  <- function(X_start, X_end,X_increment,Y_start,Y_increment,Y_end,step
     break_indicator_y
 
     if(Y_0pixel > min(y_breaks_loc) | Y_0pixel <0 ){
-      Y_0pixel <-  min(y_breaks_loc)
+
+      if(Y_actual[1]>0){
+        Y_0pixel <- min(y_breaks_loc) - Y_actual[1]/ (y_increment/break_indicator_y)
+      } else {
+        Y_0pixel <-  min(y_breaks_loc)
+      }
 
 
     }
 
   } else{
 
+    if(Y_actual[1]>0){
+      Y_0pixel <- min(y_breaks_loc) - Y_actual[1]/ (y_increment/break_indicator_y)
+    } else {
+      Y_0pixel <-  min(y_breaks_loc)
+    }
 
-    Y_0pixel <-  min(y_breaks_loc)
 
   }
 
   return(list(Y_0pixel= Y_0pixel,
-              y_increment = Y_increment/break_indicator_y,
+              y_increment = y_increment/break_indicator_y,
               X_0pixel = X_0pixel,
-              x_increment = X_increment/x_increment
+              x_increment = x_increment/x_pixels_increment
   ))
 }
 

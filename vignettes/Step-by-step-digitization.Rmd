@@ -1,0 +1,169 @@
+---
+title: "Step-by-step-digitization"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Step-by-step-digitization}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = TRUE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,eval=FALSE, include=FALSE)
+```
+
+# Example of digitizer workflow
+
+```{r eval=FALSE, include=FALSE}
+# if not previously installed 
+# library(devtools)
+# install()
+library(SurvdigtizeR)
+```
+
+```{r required-packages}
+# Required packages and 
+
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+
+## We use this function for plotting arrays
+fun_ggplot <- function(array, sen = 0.9){
+  array%>% as.data.frame() %>%
+    mutate(row = 1:n()) %>%
+    gather(-row, key= "column", value = "val") %>%
+    mutate(column = as.numeric(str_remove_all(column,"V"))) %>%
+    filter( val < sen) %>% 
+    ggplot(aes(x = column, y = row, fill = val )) +
+    geom_tile() 
+}
+```
+
+
+
+
+```{r function inputs}
+img_path = here::here("vignettes","Test2OS.jpeg")
+bg_lightness = 0.1
+attempt_OCR = F
+word_sensitivity = 30
+num_curves = 2
+censoring = F
+x_start = 0
+x_end = 36
+x_increment = 3 # increment between EVERY tick, including minor ones
+y_start = 10
+y_end = 100
+y_increment = 10
+y_text_vertical = F
+```
+
+### Reading in KM curves
+
+```{r reading}
+
+step1 <-img_read(path = img_path)
+fun_ggplot(step1[,,3])
+
+```
+
+```{r}
+step2 <- axes_identify(fig.hsl = step1,bg_lightness = bg_lightness)
+fig.cropped <- step2$fig.hsl
+axes <- step2$axes
+
+fun_ggplot(step1[,,3]) +
+  geom_vline(aes(xintercept = c(min(axes$xaxis))), color = "green") +
+  geom_vline(aes(xintercept = c(max(axes$xaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(max(axes$yaxis))), color = "green") +
+  geom_hline(aes(yintercept = c(min(axes$yaxis))), color = "green") +
+  theme_bw()
+
+```
+
+### Removing 'non KM portions of the plot'
+
+```{r clean plot}
+
+step3 <- fig_clean(fig.hsl = fig.cropped, bg_lightness = bg_lightness, attempt_OCR = attempt_OCR, word_sensitivity = word_sensitivity )
+
+step3 %>%
+ ggplot(aes(x =x ,y =y)) +
+ geom_point() +
+ theme_bw()
+
+```
+### Detecting curves
+
+```{r detecting-curves}
+
+step4 <-color_cluster(fig.df = step3, num_curves = num_curves, censoring = censoring)
+
+step4 %>%
+ ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+ geom_point(size = 0.01) +
+ theme_bw()
+
+```
+
+### Potential overlap
+
+```{r potential overlap}
+step5 <- overlap_detect(fig.grp = step4)
+
+step5 %>%
+ ggplot(aes(x =x ,y =y, color = as.factor(group))) +
+ geom_point(size = 0.01) +
+ theme_bw()
+
+```
+
+### Event detect
+
+```{r}
+step6 <- step6 <-lines_isolate(fig.curves = step5)
+#
+step6[[1]] %>%
+  ggplot(aes(x =x ,y =y , color = curve)) +
+  geom_point()
+# 
+# 
+step6[[2]] %>%
+  ggplot(aes(x =x ,y =y , color = curve)) +
+  geom_point()
+# 
+```
+
+### Mapping pixels to actual scales
+
+```{r}
+step7 <- range_detect(step1_fig = step1,
+                      step2_axes = step2$axes,
+                      x_start = x_start,
+                      x_end = x_end,
+                      x_increment = x_increment,
+                      y_start = y_start,
+                      y_end = y_end,
+                      y_increment = y_increment,
+                      y_text_vertical = y_text_vertical)
+
+```
+
+```{r}
+# Merging x and y-axis values with curves
+step8 <- fig_summarize(lines_vector = step6, range_list = step7)
+
+step8 %>%
+ ggplot(aes(x = time, y = St, color = curve, group = curve)) +
+ geom_step() +
+ theme_bw()
+
+```

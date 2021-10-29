@@ -1,13 +1,13 @@
-#' fun_idplot
-#' Identifies plot location
+#' axes_identify
+#' Identifies plot axes location
 #' @param fig.hsl array of pixels in HSL format (hue/saturation/lightness)
-#' @param i.sen a double between 0 and 1 indicating sensitivity (What doesn't count as white space) the higher the value the more aggressive in ignoring colours similar to white.
+#' @param bg_lightness a lightness threshold value between 0 and 1; every pixel with lightness > bg_lightness is considered background and removed (default: 0.1).
 #'
-#' @return a list w/ 3 objects, fig.hsl: the array of pixels cropped to the axes, xaxis: a vector of integers to index plot by columns, yaxis: a vector of integers to index plot by rows.
+#' @return a list w/ 2 objects, fig.hsl: the array of pixels cropped to the axes, axes: a list of xaxis, yaxis: vectors of integers to index plot by columns and rows respectively.
 #' @export
 #'
-#' @examples # fun_idplot(ls.fig = fun_readout, i.sen = 0.10)
-fun_idplot  <- function(fig.hsl, i.sen = 0.05){
+#' @examples # axes_identify(fig.hsl = figure, bg_lightness = 0.1)
+axes_identify  <- function(fig.hsl, bg_lightness = 0.1){
 # To do
   # - make sure locations of zeroes doesnt break
   # - test w/ other curves
@@ -16,10 +16,10 @@ fun_idplot  <- function(fig.hsl, i.sen = 0.05){
 
 # getting the lightness value
 fig.l  <- fig.hsl[,,3]
-# white is equal to 1 seeing how many have values are higher than sensitivitys
-v.colsums <- colSums(1-fig.l > i.sen)
-# idenftifying rowSums number of pixels where 1-pixel > i.sen
-v.rowsums <- rowSums(1-fig.l > i.sen)
+# white is equal to 1 seeing how many have values are higher than bg_lightness
+v.colsums <- colSums(1-fig.l > bg_lightness)
+# identifying rowSums number of pixels where 1-pixel > bg_lightness
+v.rowsums <- rowSums(1-fig.l > bg_lightness)
 
 # identify all the collumns w/ rowsums close to our max
 v.xaxis <-  which(v.colsums[which.max(v.colsums)]*0.95 < v.colsums)
@@ -70,6 +70,6 @@ if(is.finite(i.yaxis.end)){
   }
 }
 
-return(list(fig.hsl = fig.hsl[yaxis,xaxis,], axis=list(xaxis = xaxis, yaxis = yaxis)))
+return(list(fig.hsl = fig.hsl[yaxis,xaxis,], axes=list(xaxis = xaxis, yaxis = yaxis)))
 }
 
