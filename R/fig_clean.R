@@ -13,7 +13,6 @@
 fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensitivity = 30){
 
   require(tesseract)
-  require(magick)
   require(stringr)
   require(dplyr)
   require(xml2)
@@ -28,7 +27,7 @@ fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensit
     fig.hsl_flip <- fig.hsl[dim(fig.hsl)[1]:1,,]
 
     # Taken from a stack exchange basically takes xml output into a tibble
-    k1<- ocr( magick::image_read(writeJPEG(fig.l_flip)),HOCR = T)
+    k1<- ocr( writeJPEG(fig.l_flip),HOCR = T)
     doc <- read_xml(k1)
     nodes <- xml_find_all(doc, ".//span[@class='ocrx_word']")
     words <- xml_text(nodes)
