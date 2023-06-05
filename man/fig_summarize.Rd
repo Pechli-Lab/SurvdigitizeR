@@ -2,23 +2,25 @@
 % Please edit documentation in R/fig_summarize.R
 \name{fig_summarize}
 \alias{fig_summarize}
-\title{fig_summarize
-Brings together the curve and range data from into a format that is readable by the survival function}
+\title{Figure Summarization}
 \usage{
-fig_summarize(lines_vector, range_list)
+fig_summarize(lines_vector, range_list, y_start = 0, y_end = 1)
 }
 \arguments{
-\item{range_list}{: output from range_detect}
+\item{lines_vector}{The output from the `lines_isolate` function.}
 
-\item{lines_vector:}{output from lines_isolate}
+\item{range_list}{The output from the `range_detect` function.}
+
+\item{y_start}{Starting value of the y-axis, defaults to the global `y_start` variable.}
+
+\item{y_end}{Ending value of the y-axis, defaults to the global `y_end` variable.}
 }
 \value{
-a dataframe with id, times, St, curve
+A dataframe with columns: 'id', 'times', 'St', and 'curve'.
 }
 \description{
-fig_summarize
-Brings together the curve and range data from into a format that is readable by the survival function
+Integrates the curve and range data into a format that is readable by the survival function.
 }
 \examples{
-# fig_summarize(lines_vector, range_df)
+# fig_summarize(lines_vector, range_list, y_start, y_end)
 }

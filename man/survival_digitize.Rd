@@ -2,57 +2,66 @@
 % Please edit documentation in R/survival_digitize.R
 \name{survival_digitize}
 \alias{survival_digitize}
-\title{survival_digitize a wrapper for the digitizer end-to-end process}
+\title{Survival Digitization}
 \usage{
 survival_digitize(
   img_path,
-  bg_lightness = 0.1,
+  bg_lightness = 0.3,
   attempt_OCR = F,
   word_sensitivity = 30,
   num_curves,
-  censoring,
+  censoring = T,
   x_start,
   x_end,
   x_increment,
   y_start,
   y_end,
   y_increment,
-  y_text_vertical
+  y_text_vertical,
+  nr_neighbors = 20,
+  enhance = F,
+  impute_size = 0
 )
 }
 \arguments{
-\item{img_path}{:  location of image file}
+\item{img_path}{Location of the image file.}
 
-\item{bg_lightness}{: a lightness threshold value between 0 and 1; every pixel with lightness > bg_lightness is considered background and removed (default: 0.9)}
+\item{bg_lightness}{A lightness threshold value between 0 and 1. Every pixel with lightness > bg_lightness is considered background and removed. Default value is 0.3.}
 
-\item{Wsen:}{word sensitivity for OCR word removal}
+\item{attempt_OCR}{Logical value indicating if Optical Character Recognition (OCR) should be attempted to remove words. Default value is FALSE.}
 
-\item{OCR_words:}{logical indicating if needed to remove words}
+\item{word_sensitivity}{Sensitivity for OCR word removal. Default value is 30.}
 
-\item{num_curves:}{the number of curves in an image}
+\item{num_curves}{The number of curves in an image.}
 
-\item{censoring:}{locgical indicating if censoring is indicated by black marks}
+\item{censoring}{Logical value indicating if censoring is represented by black marks. Default value is TRUE.}
 
-\item{x_start:}{lowest X-axis label value}
+\item{x_start}{Lowest X-axis label value.}
 
-\item{x_end:}{highest X-axis label value}
+\item{x_end}{Highest X-axis label value.}
 
-\item{x_increment:}{what increments do the ticks go up in the x-axis (Note: increment between EVERY tick, including minor ones)}
+\item{x_increment}{Increment value for the X-axis ticks. Note: this should include increment between every tick, including minor ones.}
 
-\item{y_start:}{lowest y-axis label}
+\item{y_start}{Lowest Y-axis label.}
 
-\item{y_end:}{highest y-axis label}
+\item{y_end}{Highest Y-axis label.}
 
-\item{y_increment:}{what increments do the ticks go up in the y-axis (Note: increment between EVERY tick, including minor ones)}
+\item{y_increment}{Increment value for the Y-axis ticks. Note: this should include increment between every tick, including minor ones.}
 
-\item{y_text_vertical:}{whether the y-axis labels are vertical (TRUE) or horizontal (FALSE)}
+\item{y_text_vertical}{Boolean value indicating if the Y-axis labels are vertical (TRUE) or horizontal (FALSE).}
+
+\item{nr_neighbors}{Number of neighbors in k-nearest neighbors (knn) when grouping pixels by colors. Default value is 50.}
+
+\item{enhance}{Logical value indicating whether to convert HSL channels into the same scale. Default value is FALSE.}
+
+\item{impute_size}{Size parameter for imputation.}
 }
 \value{
-a dataframe with id, times, St, curve
+A dataframe with columns: 'id', 'times', 'St', and 'curve'.
 }
 \description{
-survival_digitize a wrapper for the digitizer end-to-end process
+A wrapper for the digitizer end-to-end process.
 }
 \examples{
-# survival_digitize(img_path = here::here("OS.jpg"), bg_lightness = 0.1, attempt_OCR = F , num_curves = 2, x_start = 0, x_end = 10, x_increment = 1, y_start = 0 , y_end  = 1, y_increment = 0.2, y_text_vertical = T)
+# survival_digitize(img_path = here::here("OS.jpg"), bg_lightness = 0.1, attempt_OCR = FALSE, num_curves = 2, x_start = 0, x_end = 10, x_increment = 1, y_start = 0, y_end = 1, y_increment = 0.2, y_text_vertical = TRUE)
 }

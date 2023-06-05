@@ -5,7 +5,7 @@
 \title{overlap_detect
 detects potential overlap between curves and "fills in the gaps" using knn similarity}
 \usage{
-overlap_detect(fig.grp, nr_neighbors = 100)
+overlap_detect(fig.grp, nr_neighbors = 20)
 }
 \arguments{
 \item{fig.grp:}{dataframe with x,y values and associated curve for each pixel}
@@ -20,5 +20,5 @@ overlap_detect
 detects potential overlap between curves and "fills in the gaps" using knn similarity
 }
 \examples{
-# overlap_detect(fig.dataframe, nr_neighbors = 100)
+# overlap_detect(fig.dataframe, nr_neighbors = 20)
 }

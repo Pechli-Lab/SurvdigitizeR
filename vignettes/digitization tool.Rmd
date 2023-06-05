@@ -1,0 +1,135 @@
+---
+title: "Digitization tool"
+author: "Jasper Zhang"
+date: "2023-06-05"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r ,echo=FALSE, warning=FALSE, message= FALSE}
+# install required packages using pacman package
+#install.packages("pacman")
+```
+
+
+```{r ,echo=FALSE, warning=FALSE, message= FALSE}
+# Install and load packages
+# Load pacman
+library(pacman)
+p_load(here, ggplot2, jpeg, dplyr, tidyr, stringr, imager, magick,readxl, kableExtra,SurvdigitizeR)
+rm(list = ls())
+```
+
+
+# Guide for Digitizing KM Curves
+
+This guide will walk you through the process of digitizing Kaplan-Meier (KM) curves  , We will first discuss the input to the digitization process, followed by a complete digitization example for the  KMcurve.png. The digitized results will be saved in both CSV and image formats.
+
+
+# Example of Digitizing  KMcurve.png
+
+## Digitization input
+
+
+* img_name set to  "KMcurve.png", t_img_path is set to curve in "vignettes" folder.
+
+* number of curves: 2
+
+* x range: 0 - 10 by 1
+
+* y range: 0 - 1 by 0.25
+
+* y_text_vertical: TRUE, set to TRUE if the number on y axis is in vertical direction.
+
+* impute_size: 20, the number of time intervals for curve overlapping check, suggested values: 20, 40, etc.
+
+```{r}
+img_name          = "KMcurve.png"
+t_img_path        =  paste0(here::here("vignettes"),"/",img_name)
+
+t_num_curves      = 2     # there are two curves in the plot
+
+t_x_start         = 0     # x axis range: 0 to 33 by step size 3
+t_x_end           = 10
+t_x_increment     = 1
+
+t_y_start         = 0     # y axis range: 0 to 1 by step size 0.1
+t_y_end           = 1
+t_y_increment     = 0.25
+t_y_text_vertical = TRUE  # the direction of number text on y axis, TRUE means vertical,
+                          #the same direction as text on x axis
+
+t_impute_size     = 0    # the number of time intervals for curve overlapping check,
+                          # higher number shorter intervals.
+                          # 20,40 are suggested values
+```
+
+
+## Digitization Step
+
+
+```{r , warning=FALSE, message= FALSE}
+out <- survival_digitize(img_path = t_img_path,
+                          num_curves = t_num_curves ,
+                          x_start = t_x_start,  x_end = t_x_end,  x_increment = t_x_increment,
+                          y_start = t_y_start,  y_end = t_y_end,  y_increment = t_y_increment,
+                          y_text_vertical = t_y_text_vertical,
+                          impute_size = 0)
+
+```
+
+## Save the Result to a CSV file
+
+* numerical result will be saved to "vignettes/digitized_data" folder.
+
+
+```{r}
+write.csv(out,here::here("vignettes","digitized_data",
+                         paste0("out_put_", img_name,"_Auto_Digitized.csv")),
+          row.names = FALSE)
+```
+
+
+## Plot the Digitization
+
+* specify plot details (x-range, y-range) for displaying digitization result in the same format as input
+
+
+```{r}
+result_name   = img_name
+
+out %>% 
+  ggplot(aes(x = time, y= St, color = as.factor(curve), group = curve)) +
+  geom_step() + theme_bw() + labs(color='Curves') + 
+  scale_color_manual(values = c("1" = "red", "2" = "blue")) +
+  scale_x_continuous(limits = c(t_x_start, t_x_end),
+                     breaks = seq(t_x_start, t_x_end, by = t_x_increment))+
+  scale_y_continuous(limits = c(t_y_start, t_y_end),
+                     breaks = seq(t_y_start, t_y_end, by = t_y_increment))+
+  ggtitle(paste0(result_name,"_Digitized"))
+
+```
+
+## Save the Plot
+
+* The result will be saved in "vignettes/digitized_plot/" folder.
+
+
+```{r}
+  axis_info<- axes_identify(fig.hsl = img_read(path = t_img_path))
+  fig.cropped <- axis_info$fig.hsl
+  save_height = 5
+  save_width = save_height * dim(fig.cropped)[2]/dim(fig.cropped)[1]
+  img_save_name = paste0(here::here("vignettes","digitized_plot/"),
+                         result_name,"_Auto_Digitized.png")
+  ggsave(img_save_name,width = save_width , height = save_height,)
+```
+
+
+

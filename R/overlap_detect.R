@@ -6,8 +6,9 @@
 #' @return res.df: a dataframe with the detected x,y, group values for all curves
 #' @export
 #'
-#' @examples # overlap_detect(fig.dataframe, nr_neighbors = 100)
-overlap_detect <- function(fig.grp, nr_neighbors = 100){
+#' @examples # overlap_detect(fig.dataframe, nr_neighbors = 20)
+#'
+overlap_detect <- function(fig.grp, nr_neighbors = 20){
 
   library(FNN)
   c <- 5

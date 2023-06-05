@@ -1,24 +1,31 @@
-#' fig_summarize
-#' Brings together the curve and range data from into a format that is readable by the survival function
-#' @param lines_vector: output from lines_isolate
-#' @param range_list : output from range_detect
-#'
-#' @return # a dataframe with id, times, St, curve
+#' @title Figure Summarization
+#' @description Integrates the curve and range data into a format that is readable by the survival function.
+#' @param lines_vector The output from the `lines_isolate` function.
+#' @param range_list The output from the `range_detect` function.
+#' @param y_start Starting value of the y-axis, defaults to the global `y_start` variable.
+#' @param y_end Ending value of the y-axis, defaults to the global `y_end` variable.
+#' @return A dataframe with columns: 'id', 'times', 'St', and 'curve'.
+#' @examples
+#' # fig_summarize(lines_vector, range_list, y_start, y_end)
 #' @export
 #'
-#' @examples # fig_summarize(lines_vector, range_df)
-fig_summarize <-function(lines_vector,range_list){
+fig_summarize <-function(lines_vector,range_list,y_start = 0,y_end = 1){
 
   require(tidyr)
   lines_vector <- bind_rows(lines_vector)
 
+  x_diff = min(lines_vector$x) - range_list$X_0pixel
 
-  if(range_list$X_0pixel < min(lines_vector$x)){
+  lines_vector$x = lines_vector$x - x_diff
+
+  if(range_list$X_0pixel <= min(lines_vector$x)){
     lines_vector$x <-(lines_vector$x-range_list$X_0pixel)*range_list$x_increment
 
   } else{
     lines_vector$x <-(lines_vector$x)*range_list$x_increment
   }
+
+
 
   if(max((lines_vector$y -range_list$Y_0pixel )*range_list$y_increment)   < 0.95){
 
@@ -36,6 +43,7 @@ fig_summarize <-function(lines_vector,range_list){
     lines_vector$x <- lines_vector$x + abs(min(lines_vector$x ))
 
   }
+
   out1 <-lines_vector %>%
     group_by(curve) %>%
     mutate(d1 = cumsum(c(0, diff(y)) != 0)) %>% ungroup() %>%
@@ -64,6 +72,16 @@ fig_summarize <-function(lines_vector,range_list){
   #
   #
   #  out1 <- out1 %>% bind_rows(lpoint) %>% arrange(curve, time) %>% mutate(id = 1:n())
+
+
+  num_cuv = length(unique(out1$curve))
+  for(i in c(1:num_cuv)){
+    select_cuv = out1[out1$curve == i,]
+    st = select_cuv$St - (max(select_cuv$St) - y_end)
+    st[select_cuv$St == y_start & st != y_start ] = y_start
+    out1[out1$curve == i,]$St = st
+  }
+
 
   return(out1)
 }

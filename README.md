@@ -27,18 +27,18 @@ This is a basic example digitizing the survival curve found in the vignettes fol
 
 ``` r
 library(SurvdigtizeR)
+library(here)
 
-# parent_digitizer(curve_location = here("vignettes","KMcurve.png"),
-#                                   sen = 0.3,
-#                                   Wsen_i = 30,
-#                                   OCR_words_i = T,
-#                                   num_curves1 = 2,
-#                                   x_start_i = 0,
-#                                   x_end_i = 10,
-#                                   x_incr = 1,
-#                                   y_start_i = 0,
-#                                   y_end_i = 1,y_incr = 0.25,
-#                                   Y_values_vertical =   T,censoring_i = F )
+survival_digitize(img_path = here("vignettes","KMcurve.png"),
+                                  num_curves = 2,
+                                  x_start = 0,
+                                  x_end = 10,
+                                  x_increment = 1,
+                                  y_start = 0,
+                                  y_end = 1,
+                                  y_increment = 0.25,
+                                  y_text_vertical =  T,
+                                  censoring = F)
 ```
 
 This R package was developed with the support of CADTH. 

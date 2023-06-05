@@ -5,7 +5,7 @@
 \title{color_cluster
 groups pixels of each curve in the image based on color using k-medoids clustering}
 \usage{
-color_cluster(fig.df, num_curves = 3, censoring = F)
+color_cluster(fig.df, num_curves = 3, censoring = F, enhance = F)
 }
 \arguments{
 \item{fig.df}{a dataframe with x,y and h,s,l values for each pixel}
@@ -13,6 +13,8 @@ color_cluster(fig.df, num_curves = 3, censoring = F)
 \item{num_curves}{the number of curves that are on the figure to be digitized}
 
 \item{censoring}{logical indicating whether censoring occurs in a different color (usually black)}
+
+\item{enhance}{indicating whether converting HSl channcels into same scale}
 }
 \value{
 fig.grp: a dataframe with x,y,h,s,l values and associated group (curve) for each pixel
@@ -22,5 +24,5 @@ color_cluster
 groups pixels of each curve in the image based on color using k-medoids clustering
 }
 \examples{
-# color_cluster(fig.df =  fig.df, num_curves = 3, censoring = F)
+# color_cluster(fig.df =  fig.df, num_curves = 3, censoring = F, enhance = F)
 }

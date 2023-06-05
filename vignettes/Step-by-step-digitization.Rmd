@@ -11,6 +11,7 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
+  
 )
 ```
 
@@ -20,20 +21,15 @@ knitr::opts_chunk$set(echo = TRUE,eval=FALSE, include=FALSE)
 
 # Example of digitizer workflow
 
-```{r eval=FALSE, include=FALSE}
-# if not previously installed 
-# library(devtools)
-# install()
-library(SurvdigtizeR)
+```{r ,echo=FALSE, warning=FALSE, message= FALSE}
+# Install and load packages
+# Load pacman
+library(pacman)
+p_load(here, ggplot2, jpeg, dplyr, tidyr, stringr, imager, magick,readxl, kableExtra,SurvdigitizeR)
+rm(list = ls())
 ```
 
 ```{r required-packages}
-# Required packages and 
-
-library(dplyr)
-library(tidyr)
-library(ggplot2)
-library(stringr)
 
 ## We use this function for plotting arrays
 fun_ggplot <- function(array, sen = 0.9){
@@ -50,22 +46,28 @@ fun_ggplot <- function(array, sen = 0.9){
 
 
 
-```{r function inputs}
-img_path = here::here("vignettes","Test2OS.jpeg")
-bg_lightness = 0.1
-attempt_OCR = F
-word_sensitivity = 30
-num_curves = 2
-censoring = F
-x_start = 0
-x_end = 36
-x_increment = 3 # increment between EVERY tick, including minor ones
-y_start = 10
-y_end = 100
-y_increment = 10
-y_text_vertical = F
-```
+```{r}
 
+img_name          = "KMcurve.png"
+img_path        =  paste0(here::here("vignettes"),"/",img_name)
+
+num_curves      = 2     # there are two curves in the plot
+
+x_start         = 0     # x axis range: 0 to 10 by step size 1
+x_end           = 10
+x_increment     = 1
+
+y_start         = 0     # y axis range: 0 to 1 by step size 0.25
+y_end           = 1
+y_increment     = 0.25
+y_text_vertical = TRUE  # the direction of number text on y axis, TRUE means vertical,
+                          #the same direction as text on x axis
+
+impute_size     = 0    # the number of time intervals for curve overlapping check,
+                          # higher number shorter intervals.
+                          # 20,40 are suggested
+
+```
 ### Reading in KM curves
 
 ```{r reading}
@@ -93,7 +95,7 @@ fun_ggplot(step1[,,3]) +
 
 ```{r clean plot}
 
-step3 <- fig_clean(fig.hsl = fig.cropped, bg_lightness = bg_lightness, attempt_OCR = attempt_OCR, word_sensitivity = word_sensitivity )
+step3 <- fig_clean(fig.hsl = fig.cropped)
 
 step3 %>%
  ggplot(aes(x =x ,y =y)) +
@@ -105,7 +107,11 @@ step3 %>%
 
 ```{r detecting-curves}
 
-step4 <-color_cluster(fig.df = step3, num_curves = num_curves, censoring = censoring)
+step4 <-color_cluster(fig.df = step3, num_curves = num_curves, censoring = FALSE)
+
+# if curves overlap observed at the beginning of the study time
+if(impute_size > 0){
+  step4 <- impute_overlap(step4,impute_size)}
 
 step4 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -117,7 +123,7 @@ step4 %>%
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(fig.grp = step4)
+step5 <- overlap_detect(fig.grp = step4,30)
 
 step5 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -159,7 +165,7 @@ step7 <- range_detect(step1_fig = step1,
 
 ```{r}
 # Merging x and y-axis values with curves
-step8 <- fig_summarize(lines_vector = step6, range_list = step7)
+step8 <- fig_summarize(step6, step7,y_start = y_start,y_end = y_end)
 
 step8 %>%
  ggplot(aes(x = time, y = St, color = curve, group = curve)) +
