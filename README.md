@@ -1,4 +1,4 @@
-# SurvdigtizeR
+# SurvdigitizeR
 
 <!-- badges: start -->
 <!-- badges: end -->

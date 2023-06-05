@@ -22,7 +22,7 @@ knitr::opts_chunk$set(echo = TRUE)
 # Install and load packages
 # Load pacman
 library(pacman)
-p_load(here, ggplot2, jpeg, dplyr, tidyr, stringr, imager, magick,readxl, kableExtra,SurvdigitizeR)
+p_load(here, ggplot2, jpeg, dplyr, tidyr, stringr, imager, magick,readxl, kableExtra, SurvdigitizeR)
 rm(list = ls())
 ```
 
@@ -47,7 +47,7 @@ This guide will walk you through the process of digitizing Kaplan-Meier (KM) cur
 
 * y_text_vertical: TRUE, set to TRUE if the number on y axis is in vertical direction.
 
-* impute_size: 20, the number of time intervals for curve overlapping check, suggested values: 20, 40, etc.
+* impute_size: 0, the number of time intervals for curve overlapping check, 0 for skipping the step, suggested values: 20, 40, etc.
 
 ```{r}
 img_name          = "KMcurve.png"
