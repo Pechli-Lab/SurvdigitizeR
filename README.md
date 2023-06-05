@@ -7,7 +7,7 @@ The survdigitzerR package takes as input JPEG or PNG kaplan-meier curves and pro
 
 ## Installation
 
-You can install the released version of SurvdigtizeR from github.
+You can install the released version of SurvdigitizeR from github.
 
 ``` r
 # Install development version from GitHub
@@ -26,7 +26,7 @@ install()
 This is a basic example digitizing the survival curve found in the vignettes folder.
 
 ``` r
-library(SurvdigtizeR)
+library(SurvdigitizeR)
 library(here)
 
 survival_digitize(img_path = here("vignettes","KMcurve.png"),
