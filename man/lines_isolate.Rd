@@ -8,7 +8,7 @@ Select the final singular y values for each curve (Note: this is where additiona
 lines_isolate(fig.curves)
 }
 \arguments{
-\item{fig.curves}{: a dataframe with x, y and group values}
+\item{fig.curves}{a dataframe with x, y and group values}
 }
 \value{
 res_list: a vector with a dataframe for each curve

@@ -7,13 +7,13 @@
 fig_summarize(lines_vector, range_list, y_start = 0, y_end = 1)
 }
 \arguments{
-\item{lines_vector}{The output from the `lines_isolate` function.}
+\item{lines_vector}{The output from the \code{lines_isolate} function.}
 
-\item{range_list}{The output from the `range_detect` function.}
+\item{range_list}{The output from the \code{range_detect} function.}
 
-\item{y_start}{Starting value of the y-axis, defaults to the global `y_start` variable.}
+\item{y_start}{Starting value of the y-axis, defaults to the global \code{y_start} variable.}
 
-\item{y_end}{Ending value of the y-axis, defaults to the global `y_end` variable.}
+\item{y_end}{Ending value of the y-axis, defaults to the global \code{y_end} variable.}
 }
 \value{
 A dataframe with columns: 'id', 'times', 'St', and 'curve'.

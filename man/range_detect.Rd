@@ -37,13 +37,13 @@ range_detect(
 \item{y_text_vertical}{whether the y -axis label text is vertical or horizontal)}
 }
 \value{
-# a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and x_increment.
+a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and x_increment.
 }
 \description{
 range_detect
 detects how X and y pixel values map to time and survival values respectively
 }
 \examples{
-# range_detect(step1_fig, step2_axes, x_start, x_end, x_increment,y_start, y_increment, y_end, y_text_vertical)
+# range_detect(step1_fig, step2_axes, x_start, x_end, x_increment, y_start, y_increment, y_end, y_text_vertical)
 
 }

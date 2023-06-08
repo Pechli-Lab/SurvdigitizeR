@@ -10,15 +10,8 @@
 #' @export
 #'
 #' @examples # fig_clean(fig.hsl = figure, bg_lightness = 0.1, attempt_OCR = T, word_sensitivity = 30)
+#'
 fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensitivity = 30){
-
-  require(tesseract)
-  require(magick)
-  require(stringr)
-  require(dplyr)
-  require(xml2)
-
-
 
   if(attempt_OCR == T){
 
@@ -27,25 +20,25 @@ fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensit
     fig.l_flip <- fig.l[dim(fig.l)[1]:1,]
     fig.hsl_flip <- fig.hsl[dim(fig.hsl)[1]:1,,]
 
-    # Taken from a stack exchange basically takes xml output into a tibble
-    k1<- ocr( magick::image_read(writeJPEG(fig.l_flip)),HOCR = T)
-    doc <- read_xml(k1)
-    nodes <- xml_find_all(doc, ".//span[@class='ocrx_word']")
-    words <- xml_text(nodes)
-    meta <- xml_attr(nodes, 'title')
-    bbox <- str_replace(str_extract(meta, "bbox [\\d ]+"), "bbox ", "")
-    conf <- as.numeric(str_replace(str_extract(meta, "x_wconf.*"), "x_wconf ", ""))
+    # Taken from a stack exchange basically takes xml output into a tibblefunc
+    k1<- tesseract::ocr( magick::image_read(jpeg::writeJPEG(fig.l_flip)),HOCR = T)
+    doc <- xml2::read_xml(k1)
+    nodes <- xml2::xml_find_all(doc, ".//span[@class='ocrx_word']")
+    words <- xml2::xml_text(nodes)
+    meta <- xml2::xml_attr(nodes, 'title')
+    bbox <- stringr::str_replace(stringr::str_extract(meta, "bbox [\\d ]+"), "bbox ", "")
+    conf <- as.numeric(stringr::str_replace(stringr::str_extract(meta, "x_wconf.*"), "x_wconf ", ""))
 
     if(any(conf > word_sensitivity)){
-      res_ocr <- tibble(confidence = conf, word = words, bbox = bbox)
+      res_ocr <- tibble::tibble(confidence = conf, word = words, bbox = bbox)
 
-      bbox_mat <- apply(str_split(res_ocr$bbox, pattern = " ",simplify = T), 2, as.numeric)
+      bbox_mat <- apply(stringr::str_split(res_ocr$bbox, pattern = " ",simplify = T), 2, as.numeric)
       bbox_mat <- as.data.frame(bbox_mat)
 
       colnames(bbox_mat) <- c("x0","y0","x1","y1")
 
-      res_ocr <- bind_cols(res_ocr,bbox_mat)
-      res_ocr <- filter(res_ocr, confidence > word_sensitivity)
+      res_ocr <- dplyr::bind_cols(res_ocr,bbox_mat)
+      res_ocr <- dplyr::filter(res_ocr, confidence > word_sensitivity)
 
 
       # Removing identified words
@@ -75,5 +68,3 @@ fig_clean  <- function(fig.hsl, bg_lightness = 0.1, attempt_OCR = F, word_sensit
   }
   return(fig.df)
 }
-
-

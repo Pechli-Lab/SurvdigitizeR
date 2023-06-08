@@ -1,7 +1,7 @@
 #' overlap_detect
 #' detects potential overlap between curves and "fills in the gaps" using knn similarity
-#' @param fig.grp: dataframe with x,y values and associated curve for each pixel
-#' @param nr_neighbors: how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)
+#' @param fig.grp dataframe with x,y values and associated curve for each pixel
+#' @param nr_neighbors how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)
 #'
 #' @return res.df: a dataframe with the detected x,y, group values for all curves
 #' @export
@@ -10,14 +10,13 @@
 #'
 overlap_detect <- function(fig.grp, nr_neighbors = 20){
 
-  library(FNN)
   c <- 5
 
   fig.knn <- fig.grp[order(fig.grp$x, -fig.grp$y),]
   groups <- unique(fig.grp$group)
 
   # get knn indices and distances
-  knn <- get.knn(fig.knn, nr_neighbors)
+  knn <- FNN::get.knn(fig.knn, nr_neighbors)
   knn_groups <- t(apply(knn$nn.index, 1, function(r) fig.knn$group[r]))
 
   # calculate "well-placed" score for each point using knn similarity
@@ -29,9 +28,9 @@ overlap_detect <- function(fig.grp, nr_neighbors = 20){
 
   # get curve average scores
   groups <- fig.knn %>%
-    group_by(group) %>%
-    summarise(scoreMean = mean(score)) %>%
-    arrange(desc(scoreMean))
+    dplyr::group_by(group) %>%
+    dplyr::summarise(scoreMean = mean(score)) %>%
+    dplyr::arrange(desc(scoreMean))
 
   # determine overlaps and best path for each curve
   res.df <- data.frame()

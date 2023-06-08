@@ -1,19 +1,19 @@
-
 # curves from step1
 fun_ocrtotbl <- function(k1){
-  doc <- read_xml(k1)
-  nodes <- xml_find_all(doc, ".//span[@class='ocrx_word']")
-  words <- xml_text(nodes)
-  meta <- xml_attr(nodes, 'title')
-  bbox <- str_replace(str_extract(meta, "bbox [\\d ]+"), "bbox ", "")
-  conf <- as.numeric(str_replace(str_extract(meta, "x_wconf.*"), "x_wconf ", ""))
-  res_ocr <- tibble(confidence = conf, word = words, bbox = bbox)
-  bbox_mat <- apply(str_split(res_ocr$bbox, pattern = " ",simplify = T), 2, as.numeric)
+  doc <- xml2::read_xml(k1)
+  nodes <- xml2::xml_find_all(doc, ".//span[@class='ocrx_word']")
+  words <- xml2::xml_text(nodes)
+  meta <- xml2::xml_attr(nodes, 'title')
+  bbox <- stringr::str_replace(stringr::str_extract(meta, "bbox [\\d ]+"), "bbox ", "")
+  conf <- as.numeric(stringr::str_replace(stringr::str_extract(meta, "x_wconf.*"), "x_wconf ", ""))
+  res_ocr <- tibble::tibble(confidence = conf, word = words, bbox = bbox)
+  bbox_mat <- apply(stringr::str_split(res_ocr$bbox, pattern = " ", simplify = T), 2, as.numeric)
   bbox_mat <- as.data.frame(bbox_mat)
   colnames(bbox_mat) <- c("x0","y0","x1","y1")
-  res_ocr <- bind_cols(res_ocr,bbox_mat)
+  res_ocr <- dplyr::bind_cols(res_ocr,bbox_mat)
   return(res_ocr)
 }
+
 
 #' range_detect
 #' detects how X and y pixel values map to time and survival values respectively
@@ -27,17 +27,15 @@ fun_ocrtotbl <- function(k1){
 #' @param y_end  what does it end in
 #' @param y_text_vertical whether the y -axis label text is vertical or horizontal)
 #'
-#' @return # a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and x_increment.
+#' @return a list with the Y_0pixel where the y-axis starts, y_increment, X_0pixel and x_increment.
 #' @export
 #'
-#' @examples # range_detect(step1_fig, step2_axes, x_start, x_end, x_increment,y_start, y_increment, y_end, y_text_vertical)
+#' @examples # range_detect(step1_fig, step2_axes, x_start, x_end, x_increment, y_start, y_increment, y_end, y_text_vertical)
 #'
 range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
                           y_start, y_increment, y_end, y_text_vertical){
 
   # Step 7 detects how x and y pixels map to time and survival values respectively
-  require(imager)
-  require(magick)
   # Creating actual scales
   X_actual <- seq(x_start, x_end, by = x_increment)
   Y_actual <- seq(y_start, y_end, by = y_increment)
@@ -75,9 +73,10 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
 
 
   # know that x's go up by x_increment pixels, know the location of the x_increment need to anchor somehow
+
   xaxis_cimg <- imager::as.cimg(fig_x[loc_y_start:1,])
   xaxis_gray <- as.matrix(xaxis_cimg)
-  x1<- ocr(magick::image_read(png::writePNG(image =  xaxis_gray)),HOCR = T)
+  x1 <- tesseract::ocr(magick::image_read(png::writePNG(image =  xaxis_gray)),HOCR = T)
   x1.tbl <-  fun_ocrtotbl(x1)
 
   ## Which of my words where properly detected by OCR
@@ -99,7 +98,8 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
     max_conf_ind2  <- which(sort(x1.tbl$confidence, index.return=T,decreasing = TRUE)$ix == 2)
 
     word_diff= abs(as.numeric(x1.tbl$word[max_conf_ind2]) - as.numeric(x1.tbl$word[max_conf_ind]))
-    pix_diff = abs(as.numeric((x1.tbl$x0[max_conf_ind2] + x1.tbl$x1[max_conf_ind2])/2    ) - as.numeric((x1.tbl$x0[max_conf_ind] + x1.tbl$x1[max_conf_ind])/2))
+    pix_diff = abs(as.numeric((x1.tbl$x0[max_conf_ind2] + x1.tbl$x1[max_conf_ind2])/2    ) -
+                     as.numeric((x1.tbl$x0[max_conf_ind] + x1.tbl$x1[max_conf_ind])/2))
 
 
     x_pixels_increment = pix_diff/(word_diff/x_increment)
@@ -216,14 +216,14 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
   # fig_y_cut[fig_y_cut<th] = 0
   fig_y_flip <-t(fig_y_cut[,dim(fig_y_cut)[2]:1])
   if(y_text_vertical ==TRUE){
-    yaxis_cimg <- as.cimg(fig_y_cut)
+    yaxis_cimg <- imager::as.cimg(fig_y_cut)
   }else{
-    yaxis_cimg <- as.cimg(fig_y_flip)
+    yaxis_cimg <- imager::as.cimg(fig_y_flip)
   }
 
   yaxis_gray <- as.matrix(yaxis_cimg)
   img_input <- (yaxis_gray[dim(yaxis_gray)[1]:1,])
-  y1<- ocr(magick::image_read(png::writePNG(image =  img_input)),HOCR = T)#ocr(magick::image_read(jpeg::writeJPEG(image =  (yaxis_gray[dim(yaxis_gray)[1]:1,]))),HOCR = T)
+  y1<- tesseract::ocr(magick::image_read(png::writePNG(image =  img_input)),HOCR = T)#ocr(magick::image_read(jpeg::writeJPEG(image =  (yaxis_gray[dim(yaxis_gray)[1]:1,]))),HOCR = T)
   #magick::image_read(png::writePNG(image =  (yaxis_gray[dim(yaxis_gray)[1]:1,])))
   #y1<- ocr(magick::image_read(jpeg::writeJPEG(image =  t(yaxis_gray))),HOCR = T)
   y1.tbl <-  fun_ocrtotbl(y1)
@@ -231,7 +231,7 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
 
   wl = y1.tbl$word #word list
   end_with_ = unlist(lapply(wl,function(x) endsWith(x, '-') | endsWith(x, '_')))
-  y1.tbl$word[end_with_] = unlist(lapply(wl[end_with_],function(x) str_sub(x,1,-2)))
+  y1.tbl$word[end_with_] = unlist(lapply(wl[end_with_],function(x) stringr::str_sub(x,1,-2)))
 
 
 
@@ -269,7 +269,9 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
     max_conf_ind2  <- which(sort(y1.tbl$confidence, index.return=T,decreasing = TRUE)$ix == 2)
 
     word_diff= abs(as.numeric(y1.tbl$word[max_conf_ind2]) - as.numeric(y1.tbl$word[max_conf_ind]))
-    pix_diff = abs(as.numeric((y1.tbl$x0[max_conf_ind2] + y1.tbl$x1[max_conf_ind2])/2    ) - as.numeric((y1.tbl$x0[max_conf_ind] + y1.tbl$x1[max_conf_ind])/2))
+    pix_diff = abs(
+      as.numeric((y1.tbl$x0[max_conf_ind2] + y1.tbl$x1[max_conf_ind2])/2    ) -
+                     as.numeric((y1.tbl$x0[max_conf_ind] + y1.tbl$x1[max_conf_ind])/2))
 
 
     y_pixels_increment = pix_diff/(word_diff/y_increment)
@@ -320,7 +322,8 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
         # if breaks and numbers are not 1-1 matching
         if (length(y_breaks_loc) >= (length(Y_actual)* 2 -2)){
 
-          match_increment = y1.tbl.multiple[(y1.tbl.multiple$x0 < y_pixels_increment & y1.tbl.multiple$x1 > y_pixels_increment),]
+          match_increment = y1.tbl.multiple[(y1.tbl.multiple$x0 < y_pixels_increment &
+                                               y1.tbl.multiple$x1 > y_pixels_increment),]
 
           if(nrow(match_increment) == 1){
 
@@ -381,21 +384,3 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
               x_increment = x_increment/x_pixels_increment
   ))
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

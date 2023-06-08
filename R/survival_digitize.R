@@ -18,7 +18,21 @@
 #' @param impute_size Size parameter for imputation.
 #' @return A dataframe with columns: 'id', 'times', 'St', and 'curve'.
 #' @examples
-#' # survival_digitize(img_path = here::here("OS.jpg"), bg_lightness = 0.1, attempt_OCR = FALSE, num_curves = 2, x_start = 0, x_end = 10, x_increment = 1, y_start = 0, y_end = 1, y_increment = 0.2, y_text_vertical = TRUE)
+#' \dontrun{
+#' survival_digitize(
+#'   img_path = here::here("OS.jpg"),
+#'   bg_lightness = 0.1,
+#'   attempt_OCR = FALSE,
+#'   num_curves = 2,
+#'   x_start = 0,
+#'   x_end = 10,
+#'   x_increment = 1,
+#'   y_start = 0,
+#'   y_end = 1,
+#'   y_increment = 0.2,
+#'   y_text_vertical = TRUE
+#' )
+#' }
 #' @export
 #'
 #'

@@ -38,10 +38,21 @@ impute_overlap<- function(fig.curves = step4, size = 50){
     max_cuv = which.max(c(lg1,lg2))
     if(max_cuv == 1){
 
-    rep = g1[g1$x >=xstart & g1$x < (xstart + win_size) & g1$y > max(g2[g2$x >= (xstart + win_size),]$y) & g1$y < min(g2[g2$x < xstart,]$y),]
-    if (nrow(rep) > 0){ rep$group = 2}
-    g2 = g2[g2$x < xstart | g2$x >= (xstart + win_size),]
-    g2 = rbind(g2,rep)
+      subset_g2_less <- g2[g2$x < xstart,]$y
+      subset_g2_greater_equal <- g2[g2$x >= (xstart + win_size),]$y
+
+      if (length(subset_g2_less) > 0 && length(subset_g2_greater_equal) > 0) {
+        rep = g1[g1$x >=xstart & g1$x < (xstart + win_size) &
+                   g1$y > max(subset_g2_greater_equal) &
+                   g1$y < min(subset_g2_less),]
+
+        if (nrow(rep) > 0){ rep$group = 2}
+        g2 = g2[g2$x < xstart | g2$x >= (xstart + win_size),]
+        g2 = rbind(g2,rep)
+      }
+
+
+
 
    # g2 %>%
    #    ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -50,10 +61,21 @@ impute_overlap<- function(fig.curves = step4, size = 50){
 
     }else{
 
-      rep = g2[g2$x >= xstart & g2$x < (xstart + win_size) & g2$y > max(g1[g1$x >= (xstart + win_size),]$y) & g2$y < min(g1[g1$x < xstart,]$y),]
-      if (nrow(rep) > 0){ rep$group = 1}
-      g1 = g1[g1$x < xstart | g1$x >= (xstart + win_size),]
-      g1 = rbind(g1,rep)
+      subset_g1_less <- g1[g1$x < xstart,]$y
+      subset_g1_greater_equal <- g1[g1$x >= (xstart + win_size),]$y
+
+      if (length(subset_g1_less) > 0 && length(subset_g1_greater_equal) > 0) {
+        rep = g2[g2$x >= xstart & g2$x < (xstart + win_size) &
+                   g2$y > max(subset_g1_greater_equal) &
+                   g2$y < min(subset_g1_less),]
+
+        if (nrow(rep) > 0){ rep$group = 1}
+        g1 = g1[g1$x < xstart | g1$x >= (xstart + win_size),]
+        g1 = rbind(g1,rep)
+        }
+
+
+
 
     }
 

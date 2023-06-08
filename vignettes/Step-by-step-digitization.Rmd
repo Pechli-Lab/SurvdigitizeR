@@ -123,7 +123,7 @@ step4 %>%
 ### Potential overlap
 
 ```{r potential overlap}
-step5 <- overlap_detect(fig.grp = step4,30)
+step5 <- overlap_detect(fig.grp = step4)
 
 step5 %>%
  ggplot(aes(x =x ,y =y, color = as.factor(group))) +
@@ -135,7 +135,7 @@ step5 %>%
 ### Event detect
 
 ```{r}
-step6 <- step6 <-lines_isolate(fig.curves = step5)
+step6  <-lines_isolate(fig.curves = step5)
 #
 step6[[1]] %>%
   ggplot(aes(x =x ,y =y , color = curve)) +

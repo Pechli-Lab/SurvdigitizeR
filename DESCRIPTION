@@ -1,5 +1,5 @@
 Package: SurvdigitizeR
-Title: Digitizing survival curves
+Title: Digitizing Survival Curves
 Version: 0.0.0.9000
 Authors@R: 
     c(person(given = "Juan David",
@@ -11,7 +11,7 @@ Authors@R:
            family = "Pechlivanoglou",
            role = c("aut"),
            email = "Petros.Pechlivanoglou@sickkids.ca",
-           comment = c(ORCID = "YOUR-ORCID-ID"))   ,
+           comment = c(ORCID = "YOUR-ORCID-ID")),
         person(given = "Alan",
            family = "Yang",
            role = c("aut"),
@@ -21,28 +21,26 @@ Authors@R:
            family = "Luu",
            role = c("aut"),
            email = "Linda.Luu@sickkids.ca",
-           comment = c(ORCID = "YOUR-ORCID-ID")))  
-Description: This package digitizes published Kaplain Meir survival curves in the form of jpegs or png for the purpose of generating a representative dataset.
+           comment = c(ORCID = "YOUR-ORCID-ID")))
+Description: This package digitizes published Kaplan-Meier survival curves in the form of jpegs or pngs for the purpose of generating a representative dataset.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.2.3
 Imports: 
     imager,
     tidyr,
     dplyr,
-    ggplot2,
     stringr,
     jpeg,
     png,
     tesseract,
-    data.table,
     xml2,
-    jpeg,
-    gdata,
     FNN,
-    cluster
+    cluster,
+    magick,
+    tibble
 Suggests: 
     knitr,
     here,

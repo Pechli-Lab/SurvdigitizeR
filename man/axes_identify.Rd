@@ -21,4 +21,5 @@ Identifies plot axes location
 }
 \examples{
 # axes_identify(fig.hsl = figure, bg_lightness = 0.1)
+
 }

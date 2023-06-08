@@ -25,4 +25,5 @@ Removes color values close to white, also possible to remove text on plot, usefu
 }
 \examples{
 # fig_clean(fig.hsl = figure, bg_lightness = 0.1, attempt_OCR = T, word_sensitivity = 30)
+
 }

@@ -8,9 +8,9 @@ detects potential overlap between curves and "fills in the gaps" using knn simil
 overlap_detect(fig.grp, nr_neighbors = 20)
 }
 \arguments{
-\item{fig.grp:}{dataframe with x,y values and associated curve for each pixel}
+\item{fig.grp}{dataframe with x,y values and associated curve for each pixel}
 
-\item{nr_neighbors:}{how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)}
+\item{nr_neighbors}{how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)}
 }
 \value{
 res.df: a dataframe with the detected x,y, group values for all curves
@@ -21,4 +21,5 @@ detects potential overlap between curves and "fills in the gaps" using knn simil
 }
 \examples{
 # overlap_detect(fig.dataframe, nr_neighbors = 20)
+
 }

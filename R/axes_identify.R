@@ -4,9 +4,12 @@
 #' @param bg_lightness a lightness threshold value between 0 and 1; every pixel with lightness > bg_lightness is considered background and removed (default: 0.1).
 #'
 #' @return a list w/ 2 objects, fig.hsl: the array of pixels cropped to the axes, axes: a list of xaxis, yaxis: vectors of integers to index plot by columns and rows respectively.
+#' @importFrom stats lag
+#' @importFrom utils tail
 #' @export
 #'
 #' @examples # axes_identify(fig.hsl = figure, bg_lightness = 0.1)
+#'
 axes_identify  <- function(fig.hsl, bg_lightness = 0.1){
   # To do
   # - make sure locations of zeroes doesnt break
