@@ -2,7 +2,12 @@ Package: SurvdigitizeR
 Title: Digitizing Survival Curves
 Version: 0.0.0.9000
 Authors@R: 
-    c(person(given = "Juan David",
+    c(person(given = "Jasper Zhongyuan",
+           family = "Zhang",
+           role = c("aut", "cre"),
+           email = "jasper.zhang@sickkids.ca",
+           comment = c(ORCID = "YOUR-ORCID-ID")),
+           person(given = "Juan David",
            family = "Rios",
            role = c("aut", "cre"),
            email = "david.rios@sickkids.ca",
