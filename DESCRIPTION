@@ -9,7 +9,7 @@ Authors@R:
            comment = c(ORCID = "YOUR-ORCID-ID")),
            person(given = "Juan David",
            family = "Rios",
-           role = c("aut", "cre"),
+           role = c("aut"),
            email = "david.rios@sickkids.ca",
            comment = c(ORCID = "YOUR-ORCID-ID")),
         person(given = "Petros",
