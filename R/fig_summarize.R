@@ -1,3 +1,8 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::`%>%`
+
+
 #' @title Figure Summarization
 #' @description Integrates the curve and range data into a format that is readable by the survival function.
 #' @importFrom magrittr %>%

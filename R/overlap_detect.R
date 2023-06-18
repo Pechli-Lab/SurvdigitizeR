@@ -1,3 +1,7 @@
+#' @importFrom magrittr %>%
+#' @export
+magrittr::`%>%`
+
 #' overlap_detect
 #' detects potential overlap between curves and "fills in the gaps" using knn similarity
 #' @param fig.grp dataframe with x,y values and associated curve for each pixel
