@@ -10,7 +10,7 @@ survival_digitize(
   attempt_OCR = F,
   word_sensitivity = 30,
   num_curves,
-  censoring = T,
+  censoring = F,
   x_start,
   x_end,
   x_increment,

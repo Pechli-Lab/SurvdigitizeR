@@ -2,7 +2,7 @@
 #' detects potential overlap between curves and "fills in the gaps" using knn similarity
 #' @param fig.grp dataframe with x,y values and associated curve for each pixel
 #' @param nr_neighbors how many nearby neighbors to consider when guessing the value of missing pixels (default: 100)
-#'
+#' @importFrom magrittr %>%
 #' @return res.df: a dataframe with the detected x,y, group values for all curves
 #' @export
 #'

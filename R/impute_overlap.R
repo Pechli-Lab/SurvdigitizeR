@@ -54,10 +54,6 @@ impute_overlap<- function(fig.curves = step4, size = 50){
 
 
 
-   # g2 %>%
-   #    ggplot(aes(x =x ,y =y, color = as.factor(group))) +
-   #    geom_point(size = 0.01) +
-   #    theme_bw()
 
     }else{
 

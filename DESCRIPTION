@@ -45,7 +45,8 @@ Imports:
     FNN,
     cluster,
     magick,
-    tibble
+    tibble,
+    magrittr
 Suggests: 
     knitr,
     here,

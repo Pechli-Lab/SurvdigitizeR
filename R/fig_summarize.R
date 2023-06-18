@@ -1,5 +1,6 @@
 #' @title Figure Summarization
 #' @description Integrates the curve and range data into a format that is readable by the survival function.
+#' @importFrom magrittr %>%
 #' @param lines_vector The output from the `lines_isolate` function.
 #' @param range_list The output from the `range_detect` function.
 #' @param y_start Starting value of the y-axis, defaults to the global `y_start` variable.
@@ -56,9 +57,11 @@ fig_summarize <-function(lines_vector,range_list,y_start = 0,y_end = 1){
   num_cuv = length(unique(out1$curve))
   for(i in c(1:num_cuv)){
     select_cuv = out1[out1$curve == i,]
-    st = select_cuv$St - (max(select_cuv$St) - y_end)
+    st = select_cuv$St   - (max(select_cuv$St) - y_end)
+    st = dplyr::if_else(st > y_end, y_end, st)
     st[select_cuv$St == y_start & st != y_start ] = y_start
-    st = dplyr::if_else(st < 0, 0, st)
+    if(st[1] != y_end){st[1] = y_end}
+    st = dplyr::if_else(st < y_start, y_start, st)
     out1[out1$curve == i,]$St = st
   }
 

@@ -1,7 +1,7 @@
 #' lines_isolate
 #' Select the final singular y values for each curve (Note: this is where additional event detection could be performed)
 #' @param fig.curves a dataframe with x, y and group values
-#'
+#' @importFrom magrittr %>%
 #' @return res_list: a vector with a dataframe for each curve
 #' @export
 #'
