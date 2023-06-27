@@ -179,7 +179,7 @@ range_detect  <- function(step1_fig, step2_axes, x_start, x_end, x_increment,
 
 
   ### Detecting y-axis breaks
-  y_breaks_loc <- which(fig_y[,(loc_x_start-1)] < 0.60)
+  y_breaks_loc <- which(fig_y[,(loc_x_start-3)] < 0.60)
   y_breaks <- diff(y_breaks_loc)
 
 

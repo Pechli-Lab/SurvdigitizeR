@@ -13,6 +13,9 @@
     <loc>/articles/Example-digitization.html</loc>
   </url>
   <url>
+    <loc>/articles/Step-by-step-digitization.html</loc>
+  </url>
+  <url>
     <loc>/articles/index.html</loc>
   </url>
   <url>
@@ -28,10 +31,37 @@
     <loc>/reference/color_cluster.html</loc>
   </url>
   <url>
+    <loc>/reference/e_gen.html</loc>
+  </url>
+  <url>
+    <loc>/reference/eventdetect.html</loc>
+  </url>
+  <url>
     <loc>/reference/fig_clean.html</loc>
   </url>
   <url>
     <loc>/reference/fig_summarize.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_cleanplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_colordetect.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_idplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_range.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_readsurv.html</loc>
+  </url>
+  <url>
+    <loc>/reference/fun_summary.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_tofinal.html</loc>
   </url>
   <url>
     <loc>/reference/img_read.html</loc>
@@ -47,6 +77,9 @@
   </url>
   <url>
     <loc>/reference/overlap_detect.html</loc>
+  </url>
+  <url>
+    <loc>/reference/parent_digitizer.html</loc>
   </url>
   <url>
     <loc>/reference/range_detect.html</loc>
