@@ -15,7 +15,8 @@
 #' @param y_text_vertical Boolean value indicating if the Y-axis labels are vertical (TRUE) or horizontal (FALSE).
 #' @param nr_neighbors Number of neighbors in k-nearest neighbors (knn) when grouping pixels by colors. Default value is 50.
 #' @param enhance Logical value indicating whether to convert HSL channels into the same scale. Default value is FALSE.
-#' @param impute_size Size parameter for imputation.
+#' @param impute_size Size parameter for imputation. It defines the number of time intervals for imputation.
+#' @param line_censoring Logical value indicating if line censoring removal should be attempted. Default value is FALSE.
 #' @return A dataframe with columns: 'id', 'times', 'St', and 'curve'.
 #' @examples
 #' \dontrun{
@@ -51,7 +52,8 @@ survival_digitize <- function(img_path,
                                y_text_vertical,
                                nr_neighbors = 20,
                                enhance = F,
-                               impute_size = 0){
+                               impute_size = 0,
+                               line_censoring = F){
 
 
   # Step 1 load curves from file
@@ -68,6 +70,9 @@ survival_digitize <- function(img_path,
   # Step 4 Group pixels to curves based on color
   step4 <- color_cluster(fig.df = step3, num_curves = num_curves, censoring = censoring,  enhance = enhance)
 
+  if(line_censoring == T){
+    step4 <- line_censoring_removal(step4)
+  }
   if(impute_size > 0){
   step4 <- impute_overlap(step4,impute_size)}
 

@@ -20,7 +20,8 @@ survival_digitize(
   y_text_vertical,
   nr_neighbors = 20,
   enhance = F,
-  impute_size = 0
+  impute_size = 0,
+  line_censoring = F
 )
 }
 \arguments{
@@ -54,7 +55,9 @@ survival_digitize(
 
 \item{enhance}{Logical value indicating whether to convert HSL channels into the same scale. Default value is FALSE.}
 
-\item{impute_size}{Size parameter for imputation.}
+\item{impute_size}{Size parameter for imputation. It defines the number of time intervals for imputation.}
+
+\item{line_censoring}{Logical value indicating if line censoring removal should be attempted. Default value is FALSE.}
 }
 \value{
 A dataframe with columns: 'id', 'times', 'St', and 'curve'.
