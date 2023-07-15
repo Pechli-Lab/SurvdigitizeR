@@ -96,7 +96,7 @@ survival_digitize <- function(img_path,
 
 
   # Step 8 detects how x and y pixels map to time and survival values respectively
-  step8 <- fig_summarize(lines_vector = step6, range_list =step7,y_start = y_start,y_end = y_end)
+  step8 <- fig_summarize(lines_vector = step6, range_list =step7,x_start = x_start, y_start = y_start,y_end = y_end)
 
   return(step8)
 }

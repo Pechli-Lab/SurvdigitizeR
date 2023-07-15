@@ -4,12 +4,14 @@
 \alias{fig_summarize}
 \title{Figure Summarization}
 \usage{
-fig_summarize(lines_vector, range_list, y_start = 0, y_end = 1)
+fig_summarize(lines_vector, range_list, x_start, y_start = 0, y_end = 1)
 }
 \arguments{
 \item{lines_vector}{The output from the \code{lines_isolate} function.}
 
 \item{range_list}{The output from the \code{range_detect} function.}
+
+\item{x_start}{The starting value of the x-axis.}
 
 \item{y_start}{Starting value of the y-axis, defaults to the global \code{y_start} variable.}
 
@@ -22,5 +24,5 @@ A dataframe with columns: 'id', 'times', 'St', and 'curve'.
 Integrates the curve and range data into a format that is readable by the survival function.
 }
 \examples{
-# fig_summarize(lines_vector, range_list, y_start, y_end)
+# fig_summarize(lines_vector, range_list, x_start, y_start, y_end)
 }
