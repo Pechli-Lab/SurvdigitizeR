@@ -76,6 +76,8 @@ fig_summarize <-function(lines_vector,range_list,x_start, y_start = 0,y_end = 1)
     }
   }
   # Reorder the dataframe by curve and id
-  out1 <- out1[order(out1$curve, out1$id), ]
+  out1 <- out1 %>% dplyr::arrange(curve, id)
+  out1 <- out1 %>% dplyr::group_by(curve) %>% dplyr::mutate(id = dplyr::row_number()) %>% dplyr::ungroup()
+
   return(out1)
 }
