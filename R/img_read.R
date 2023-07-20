@@ -26,6 +26,29 @@ img_read <- function(path){
     stop("Couldn't read in image are you sure the file is saved as a jpeg, jpg, or png?")
   )
 
+  max_size = 1500
+  if(dim(fig.arr)[1] > max_size){
+    # Suppress warnings
+    suppressWarnings({
+      img <- imager::as.cimg(fig.arr)
+    })
+
+    ratio = max_size/dim(fig.arr)[1]
+    img <- imager::imresize(img, ratio)
+
+    # Convert back to an array
+    resized_img <- as.array(img)
+
+    # Rearrange dimensions so that the depth dimension (of size 1) is the last dimension
+    resized_img <- aperm(resized_img, c(1, 2, 4, 3))
+
+    # Drop dimensions of size 1
+    resized_img <- drop(resized_img)
+    fig.arr = resized_img
+  }
+
+
+
   ## Turning BW into an RGB image
   if(length(dim(fig.arr)) == 2 ){
     temp <- array(dim = c(dim(fig.arr),3))
