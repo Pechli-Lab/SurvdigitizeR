@@ -26,6 +26,25 @@ img_read <- function(path){
     stop("Couldn't read in image are you sure the file is saved as a jpeg, jpg, or png?")
   )
 
+
+
+
+  ## Turning BW into an RGB image
+  if(length(dim(fig.arr)) == 2 ){
+    temp <- array(dim = c(dim(fig.arr),3))
+    temp[,,1] <- fig.arr
+    temp[,,2] <- fig.arr
+    temp[,,3] <- fig.arr
+    fig.arr <- temp
+    rm(temp)
+  }
+
+  # Converting RBGA images into RGB
+  if(dim(fig.arr)[3] > 3){
+    fig.arr <-  fig.arr[,,-c(4:dim(fig.arr)[3])]
+  }
+
+
   max_size = 1500
   if(dim(fig.arr)[1] > max_size){
     # Suppress warnings
@@ -45,23 +64,6 @@ img_read <- function(path){
     # Drop dimensions of size 1
     resized_img <- drop(resized_img)
     fig.arr = resized_img
-  }
-
-
-
-  ## Turning BW into an RGB image
-  if(length(dim(fig.arr)) == 2 ){
-    temp <- array(dim = c(dim(fig.arr),3))
-    temp[,,1] <- fig.arr
-    temp[,,2] <- fig.arr
-    temp[,,3] <- fig.arr
-    fig.arr <- temp
-    rm(temp)
-  }
-
-  # Converting RBGA images into RGB
-  if(dim(fig.arr)[3] > 3){
-    fig.arr <-  fig.arr[,,-c(4:dim(fig.arr)[3])]
   }
 
 
