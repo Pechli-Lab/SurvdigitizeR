@@ -56,49 +56,72 @@ survival_digitize <- function(img_path,
                                line_censoring = F){
 
 
-  # Step 1 load curves from file
-  step1 <- img_read(path = img_path)
+  # Initialize result list
+  results <- list()
 
-  # Step 2 identify plot axes location
-  step2 <- axes_identify(fig.hsl = step1,bg_lightness = bg_lightness)
-  fig.cropped <- step2$fig.hsl
-  axes <- step2$axes
-
-  # Step 3 remove plot background pixels and words
-  step3 <- fig_clean(fig.hsl = fig.cropped,bg_lightness = bg_lightness, attempt_OCR = attempt_OCR, word_sensitivity = word_sensitivity)
-
-  # Step 4 Group pixels to curves based on color
-  step4 <- color_cluster(fig.df = step3, num_curves = num_curves, censoring = censoring,  enhance = enhance)
-
-  if(line_censoring == T){
-    step4 <- line_censoring_removal(step4)
+  # Helper function to handle errors
+  handle_error <- function(e, step) {
+    stop(sprintf("Error in %s: %s", step, e$message))
   }
-  if(impute_size > 0){
-  step4 <- impute_overlap(step4,impute_size)}
 
-  # Step 5 Fill in missing/overlapped pixels
-  step5 <- overlap_detect(fig.grp =step4, nr_neighbors =nr_neighbors) #add num_neighbor as parameter
+  # Step 1: Load curves from file
+  results$step1 <- tryCatch({
+    img_read(path = img_path)
+  }, error = function(e) handle_error(e, "Step 1: Loading image"))
 
-  # Step 6 isolate the singular y values for each curve
-  step6 <-lines_isolate(fig.curves = step5)
+  # Step 2: Identify plot axes location
+  results$step2 <- tryCatch({
+    axes_identify(fig.hsl = results$step1, bg_lightness = bg_lightness)
+  }, error = function(e) handle_error(e, "Step 2: Identifying axes"))
+  fig.cropped <- results$step2$fig.hsl
+  axes <- results$step2$axes
 
-  # Step 7 detects how x and y pixels map to time and survival values respectively
-  step7 <- range_detect(step1_fig = step1,
-                         step2_axes = step2$axes,
-                         x_start = x_start,
-                         x_end = x_end,
-                         x_increment = x_increment,
-                         y_start = y_start,
-                         y_end = y_end,
-                         y_increment = y_increment,
-                         y_text_vertical = y_text_vertical)
+  # Step 3: Remove plot background pixels and words
+  results$step3 <- tryCatch({
+    fig_clean(fig.hsl = fig.cropped, bg_lightness = bg_lightness, attempt_OCR = attempt_OCR, word_sensitivity = word_sensitivity)
+  }, error = function(e) handle_error(e, "Step 3: Cleaning figure"))
 
+  # Step 4: Group pixels to curves based on color
+  results$step4 <- tryCatch({
+    color_cluster(fig.df = results$step3, num_curves = num_curves, censoring = censoring, enhance = enhance)
+  }, error = function(e) handle_error(e, "Step 4: Clustering colors"))
 
+  # Additional steps if conditions met
+  if (line_censoring) {
+    results$step4 <- tryCatch({
+      line_censoring_removal(results$step4)
+    }, error = function(e) handle_error(e, "Line Censoring Removal"))
+  }
+  if (impute_size > 0) {
+    results$step4 <- tryCatch({
+      impute_overlap(results$step4, impute_size)
+    }, error = function(e) handle_error(e, "Impute Overlap"))
+  }
 
-  # Step 8 detects how x and y pixels map to time and survival values respectively
-  step8 <- fig_summarize(lines_vector = step6, range_list =step7,x_start = x_start, y_start = y_start,y_end = y_end)
+  # Step 5: Fill in missing/overlapped pixels
+  results$step5 <- tryCatch({
+    overlap_detect(fig.grp = results$step4, nr_neighbors = nr_neighbors)
+  }, error = function(e) handle_error(e, "Step 5: Detecting overlaps"))
 
-  return(step8)
+  # Step 6: Isolate the singular y values for each curve
+  results$step6 <- tryCatch({
+    lines_isolate(fig.curves = results$step5)
+  }, error = function(e) handle_error(e, "Step 6: Isolating lines"))
+
+  # Step 7: Detects how x and y pixels map to time and survival values respectively
+  results$step7 <- tryCatch({
+    range_detect(step1_fig = results$step1, step2_axes = axes,
+                 x_start = x_start, x_end = x_end, x_increment = x_increment,
+                 y_start = y_start, y_end = y_end, y_increment = y_increment,
+                 y_text_vertical = y_text_vertical)
+  }, error = function(e) handle_error(e, "Step 7: Detecting ranges"))
+
+  # Step 8: Summarize figure into data frame
+  results$step8 <- tryCatch({
+    fig_summarize(lines_vector = results$step6, range_list = results$step7,
+                  x_start = x_start, y_start = y_start, y_end = y_end)
+  }, error = function(e) handle_error(e, "Step 8: Summarizing data"))
+
+  # Return final results
+  return(results$step8)
 }
-
-
