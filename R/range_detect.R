@@ -7,13 +7,39 @@ fun_ocrtotbl <- function(k1){
   bbox <- stringr::str_replace(stringr::str_extract(meta, "bbox [\\d ]+"), "bbox ", "")
   conf <- as.numeric(stringr::str_replace(stringr::str_extract(meta, "x_wconf.*"), "x_wconf ", ""))
   res_ocr <- tibble::tibble(confidence = conf, word = words, bbox = bbox)
-  bbox_mat <- apply(stringr::str_split(res_ocr$bbox, pattern = " ", simplify = T), 2, as.numeric)
-  bbox_mat <- as.data.frame(bbox_mat)
+
+  # update fun_ocrtotbl to properly parse bbox into x0,y0,x1,y1 columns
+  bbox_split <- stringr::str_split(res_ocr$bbox, pattern = " ", simplify = TRUE)
+
+  if (nrow(bbox_split) == 0) {
+    # no words / no bbox at all
+    bbox_mat <- data.frame(
+      x0 = numeric(0),
+      y0 = numeric(0),
+      x1 = numeric(0),
+      y1 = numeric(0)
+    )
+  } else if (ncol(bbox_split) == 4) {
+    # normal case: each bbox has 4 numbers
+    bbox_mat <- data.frame(
+      x0 = as.numeric(bbox_split[, 1]),
+      y0 = as.numeric(bbox_split[, 2]),
+      x1 = as.numeric(bbox_split[, 3]),
+      y1 = as.numeric(bbox_split[, 4])
+    )
+  } else {
+    #bbox pattern not as expected; keep row count but fill NAs
+    bbox_mat <- data.frame(
+      x0 = rep(NA_real_, nrow(bbox_split)),
+      y0 = rep(NA_real_, nrow(bbox_split)),
+      x1 = rep(NA_real_, nrow(bbox_split)),
+      y1 = rep(NA_real_, nrow(bbox_split))
+    )
+  }
   colnames(bbox_mat) <- c("x0","y0","x1","y1")
   res_ocr <- dplyr::bind_cols(res_ocr,bbox_mat)
   return(res_ocr)
 }
-
 
 #' range_detect
 #' detects how X and y pixel values map to time and survival values respectively

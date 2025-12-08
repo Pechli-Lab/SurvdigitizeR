@@ -17,7 +17,7 @@ color_cluster(fig.df, num_curves = 3, censoring = F, enhance = F)
 \item{enhance}{indicating whether converting HSl channcels into same scale}
 }
 \value{
-fig.grp: a dataframe with x,y,h,s,l values and associated group (curve) for each pixel
+fig.grp: a dataframe with x,y values and associated group (curve) for each pixel
 }
 \description{
 color_cluster

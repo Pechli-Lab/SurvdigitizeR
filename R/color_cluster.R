@@ -5,7 +5,7 @@
 #' @param censoring  logical indicating whether censoring occurs in a different color (usually black)
 #' @param enhance indicating whether converting HSl channcels into same scale
 #'
-#' @return fig.grp: a dataframe with x,y,h,s,l values and associated group (curve) for each pixel
+#' @return fig.grp: a dataframe with x,y values and associated group (curve) for each pixel
 #' @importFrom cluster clara
 #' @export
 #'
@@ -16,6 +16,15 @@ color_cluster <- function(fig.df, num_curves = 3, censoring = F, enhance = F){
   if(censoring){
     fig.df <- fig.df[fig.df$l >= 0.2,]
   }
+
+  # create output dataframe
+  fig.grp <- fig.df[, c("x", "y")]
+  # early return for single-curve case
+  if (num_curves == 1) {
+    fig.grp$group <- 1L
+    return(fig.grp)
+  }
+
 
   # running cluster algorithm to group into colours based on number of curves
 
@@ -39,7 +48,6 @@ color_cluster <- function(fig.df, num_curves = 3, censoring = F, enhance = F){
   centerpoints <- out1$medoids
   sizes <- out1$clusinfo[,'size']
 
-  fig.grp <- fig.df[,c('x','y')]
   fig.grp$group <- out1$clustering
 
   return(fig.grp)
